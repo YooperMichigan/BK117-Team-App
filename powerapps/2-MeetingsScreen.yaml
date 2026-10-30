@@ -114,14 +114,15 @@
     Properties:
       Visible: =!IsBlank(varMeeting)
       Text: |-
-        =Text(varMeeting.MeetingDate, "dddd, mmmm d") & " · " & varMeeting.StartTime & "–" &
-        Text(
-            DateAdd(
-                DateTimeValue(Text(varMeeting.MeetingDate, "yyyy-mm-dd") & " " & varMeeting.StartTime),
-                Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes),
-                TimeUnit.Minutes
-            ),
-            "hh:mm"
+        =If(
+            IsBlank(varMeeting),
+            "",
+            With(
+                {t: Value(Left(varMeeting.StartTime, 2)) * 60 + Value(Right(varMeeting.StartTime, 2))
+                    + Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes)},
+                Text(varMeeting.MeetingDate, "dddd, mmmm d") & " · " & varMeeting.StartTime & "–" &
+                Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
+            )
         )
       X: =290
       Y: =58
@@ -267,13 +268,10 @@
           Control: Label
           Properties:
             Text: |-
-              =Text(
-                  DateAdd(
-                      DateTimeValue(Text(varMeeting.MeetingDate, "yyyy-mm-dd") & " " & varMeeting.StartTime),
-                      Sum(Filter(AgendaItems, MeetingID = varMeeting.ID && Position < ThisItem.Position), Minutes),
-                      TimeUnit.Minutes
-                  ),
-                  "hh:mm"
+              =With(
+                  {t: Value(Left(varMeeting.StartTime, 2)) * 60 + Value(Right(varMeeting.StartTime, 2))
+                      + Sum(Filter(AgendaItems, MeetingID = varMeeting.ID && Position < ThisItem.Position), Minutes)},
+                  Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
               )
             X: =16
             Y: =12
