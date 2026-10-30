@@ -490,8 +490,8 @@
     Control: Classic/DropDown
     Properties:
       Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
-      Items: |-
-        =ForAll(Sort(CheckPilots, ListOrder, SortOrder.Ascending), {Value: Title})
+      Items: =Sort(CheckPilots, ListOrder, SortOrder.Ascending)
+      Value: =Title
       AllowEmptySelection: =true
       Default: =""
       X: =1010
@@ -541,7 +541,7 @@
                     Title: txtTopic.Text,
                     MeetingID: varMeeting.ID,
                     Position: If(IsBlank(lastPos), 0, lastPos) + 1,
-                    Presenter: ddPresenter.Selected.Value,
+                    Presenter: ddPresenter.Selected.Title,
                     Minutes: Value(txtMinutes.Text),
                     Status: "Open"
                 })
