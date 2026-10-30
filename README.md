@@ -7,7 +7,13 @@ The first feature is the team **meeting agenda**.
 
 See `docs/spec.md` for the product spec and `CLAUDE.md` for build rules.
 
-## Run it
+## Hosted version (no Terminal needed)
+
+`hosted/bk117-agenda.html` is a single-page version of the agenda, published as a private
+claude.ai page with a shared database, so the team opens a link instead of running anything.
+Same features and sample data; the owner shares it from the page's Share menu.
+
+## Run it locally
 
 ```bash
 npm install

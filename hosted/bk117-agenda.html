@@ -1,0 +1,428 @@
+<title>BK117 Check Pilots</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: meeting list beside the agenda on a landscape iPad, stacked above it in portrait and on phones. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --text: #1a2330;
+  --muted: #5a6879;
+  --accent: #0b5cad;
+  --accent-text: #ffffff;
+  --border: #d6dce4;
+  --warn-bg: #fff4d6;
+  --warn-text: #6b4b00;
+  --ok-bg: #e2f3e7;
+  --ok-text: #1d6b36;
+  --danger: #b8382a;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #1a212b; --text: #e6eaf0; --muted: #9aa7b6; --accent: #5aa2ec; --accent-text: #0b1420;
+    --border: #2c3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --ok-bg: #173523; --ok-text: #8fdca9; --danger: #ef7b6e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #1a212b; --text: #e6eaf0; --muted: #9aa7b6; --accent: #5aa2ec; --accent-text: #0b1420;
+  --border: #2c3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --ok-bg: #173523; --ok-text: #8fdca9; --danger: #ef7b6e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; }
+.banner { background: var(--warn-bg); color: var(--warn-text); font-size: 14px; text-align: center; padding-block: 8px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-block: 12px; border-bottom: 1px solid var(--border);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.header h1 { margin: 0; font-size: 22px; }
+h2 { margin: 0 0 4px; font-size: 20px; text-wrap: balance; }
+h3 { margin: 0; font-size: 17px; }
+
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); }
+.side { padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px;
+  border-right: 1px solid var(--border); display: grid; gap: 12px; align-content: start; }
+.main { padding-block: 16px; padding-left: 16px; padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 900px; min-width: 0; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .side { border-right: none; border-bottom: 1px solid var(--border); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+}
+.list-heading { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 6px; }
+.meeting-link { display: grid; gap: 2px; width: 100%; text-align: left; min-height: 44px; padding: 8px 10px; margin-bottom: 6px;
+  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+.meeting-link.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.meeting-date { font-weight: 600; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.agenda-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.agenda { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 10px; }
+.item { display: grid; gap: 10px; }
+.item.discussed { box-shadow: inset 4px 0 0 var(--ok-text); }
+.item.carried { opacity: 0.7; }
+.item-top { display: flex; gap: 12px; align-items: flex-start; }
+.item-time { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); min-width: 48px; }
+.item-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.item-title { font-weight: 600; }
+.item-notes { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.badge { font-size: 13px; padding: 3px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+.badge.discussed { background: var(--ok-bg); color: var(--ok-text); border-color: transparent; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.actions { margin-top: 16px; }
+.form { display: grid; gap: 10px; margin-top: 8px; }
+label { display: grid; gap: 4px; font-size: 15px; color: var(--muted); flex: 1 1 160px; min-width: 0; }
+.item-edit label { flex: 0 1 220px; }
+input, select, textarea { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 10px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 100%; min-width: 0; }
+textarea { min-height: 72px; resize: vertical; }
+.button { min-height: 44px; padding: 0 16px; font: inherit; font-size: 16px; border-radius: 8px; cursor: pointer;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.button.danger { color: var(--danger); }
+.button.armed { background: var(--danger); color: var(--surface); border-color: var(--danger); }
+.button.icon { min-width: 44px; padding: 0; }
+.button.block { width: 100%; }
+.button:disabled { opacity: 0.45; cursor: default; }
+.link { background: none; border: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.error { color: var(--danger); }
+.notice { background: var(--ok-bg); color: var(--ok-text); padding: 8px 12px; border-radius: 8px; }
+.empty { padding-block: 24px; }
+</style>
+
+<div class="banner">Proof of concept. All content is sample data, not Air Methods records.</div>
+<header class="header">
+  <h1>BK117 Check Pilots</h1>
+  <span class="muted">Team meeting agenda</span>
+</header>
+<div id="root"><p class="main muted">Loading meetings…</p></div>
+
+<script>
+(() => {
+  const root = document.getElementById('root');
+  const state = {
+    db: null, unavailable: false, readOnly: false,
+    pilots: [], meetings: [], items: [], loaded: { pilots: false, meetings: false, items: false },
+    selected: null, error: null, notice: null, armed: null,
+  };
+
+  // ---------- formatting ----------
+  const pad = (n) => String(n).padStart(2, '0');
+  function formatDate(iso) {
+    const [y, m, d] = String(iso).split('-').map(Number);
+    if (!y || !m || !d) return iso;
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function addMinutes(time, minutes) {
+    const [h, m] = String(time).split(':').map(Number);
+    const total = (((h || 0) * 60 + (m || 0) + minutes) % 1440 + 1440) % 1440;
+    return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+  }
+  const duration = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} min`);
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  // ---------- data helpers ----------
+  const sortKey = (m) => `${m.date}T${m.startTime}`;
+  function sortedMeetings() {
+    const up = state.meetings.filter((m) => m.status !== 'held').sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+    const past = state.meetings.filter((m) => m.status === 'held').sort((a, b) => sortKey(b).localeCompare(sortKey(a)));
+    return { up, past };
+  }
+  const itemsFor = (meetingId) => state.items.filter((i) => i.meetingId === meetingId).sort((a, b) => a.position - b.position);
+  const pilotName = (id) => state.pilots.find((p) => p.id === id)?.name ?? null;
+  const sortedPilots = () => [...state.pilots].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  // ---------- DOM helper (text is always set as text, never HTML) ----------
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const k of kids.flat()) if (k != null && k !== false) el.append(k instanceof Node ? k : String(k));
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else if (k === 'class') el.className = v;
+      else if (k in el) el[k] = v;
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    return el;
+  }
+
+  // ---------- writes ----------
+  async function write(fn) {
+    state.error = null;
+    try { await fn(); } catch (e) {
+      state.error = e?.code === 'invalid_argument' && state.readOnly === null
+        ? 'You can view this agenda but not change it. Ask the owner for Contributor access.'
+        : `Could not save: ${e?.message || 'unknown error'}. Try again.`;
+      if (e?.code === 'invalid_argument' && state.readOnly === null) state.readOnly = true;
+    }
+    render();
+  }
+  const items = () => state.db.collection('items');
+  const updateItem = (id, patch) => write(() => state.db.doc(`items/${id}`).update(patch));
+
+  // Two taps for destructive actions: the first arms the button, the second runs it.
+  function armed(key, run) {
+    if (state.armed === key) { state.armed = null; run(); return; }
+    state.armed = key;
+    render();
+    setTimeout(() => { if (state.armed === key) { state.armed = null; render(); } }, 4000);
+  }
+
+  async function createMeeting() {
+    const v = (id) => document.getElementById(id).value.trim();
+    const title = v('draft-mtitle'), date = v('draft-mdate'), startTime = v('draft-mtime'), location = v('draft-mloc');
+    if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(startTime)) {
+      state.error = 'Enter a title, a date and a start time.';
+      render();
+      return;
+    }
+    await write(async () => {
+      const ref = await state.db.collection('meetings').add({ title, date, startTime, location, status: 'upcoming' });
+      state.selected = ref.id;
+    });
+  }
+
+  async function addItem(meetingId) {
+    const title = document.getElementById('draft-title').value.trim();
+    const presenter = document.getElementById('draft-presenter').value;
+    const minutes = Number(document.getElementById('draft-minutes').value);
+    if (!title || !Number.isInteger(minutes) || minutes < 1 || minutes > 240) {
+      state.error = 'Enter a topic and a time of 1 to 240 minutes.';
+      render();
+      return;
+    }
+    const position = Math.max(0, ...itemsFor(meetingId).map((i) => i.position)) + 1;
+    await write(() => items().add({ meetingId, position, title, presenterId: presenter || null, minutes, notes: '', status: 'open', carriedFromDate: null }));
+    if (!state.error) document.getElementById('draft-title').value = '';
+  }
+
+  function move(item, direction) {
+    const list = itemsFor(item.meetingId);
+    const other = list[list.indexOf(item) + (direction === 'up' ? -1 : 1)];
+    if (!other) return;
+    write(async () => {
+      await state.db.doc(`items/${item.id}`).update({ position: other.position });
+      await state.db.doc(`items/${other.id}`).update({ position: item.position });
+    });
+  }
+
+  // Copies every open item to the next upcoming meeting and marks the originals carried.
+  function carryOver(meeting) {
+    const { up } = sortedMeetings();
+    const next = up.find((m) => m.id !== meeting.id && sortKey(m) > sortKey(meeting));
+    if (!next) {
+      state.error = 'There is no later meeting to carry items to. Create the next meeting first.';
+      render();
+      return;
+    }
+    const open = itemsFor(meeting.id).filter((i) => i.status === 'open');
+    write(async () => {
+      let position = Math.max(0, ...itemsFor(next.id).map((i) => i.position));
+      for (const i of open) {
+        position += 1;
+        await items().add({ meetingId: next.id, position, title: i.title, presenterId: i.presenterId ?? null, minutes: i.minutes,
+          notes: '', status: 'open', carriedFromDate: meeting.date });
+        await state.db.doc(`items/${i.id}`).update({ status: 'carried' });
+      }
+      state.notice = { text: `Carried ${plural(open.length, 'item')} to ${formatDate(next.date)}.`, meetingId: next.id };
+    });
+  }
+
+  // ---------- views ----------
+  function meetingList() {
+    const { up, past } = sortedMeetings();
+    const link = (m) => {
+      const list = itemsFor(m.id);
+      const total = list.reduce((s, i) => s + i.minutes, 0);
+      return h('button', { class: m.id === state.selected ? 'meeting-link active' : 'meeting-link', onclick: () => select(m.id) },
+        h('span', { class: 'meeting-date' }, formatDate(m.date)),
+        h('span', { class: 'muted small' }, `${m.startTime} · ${plural(list.length, 'item')} · ${duration(total)}`));
+    };
+    const group = (label, list) => h('section', null,
+      h('h2', { class: 'list-heading' }, label),
+      list.length ? list.map(link) : h('p', { class: 'muted small' }, 'None'));
+    return h('nav', { class: 'side', 'aria-label': 'Meetings' },
+      state.readOnly === true ? null : h('button', { class: 'button primary block', onclick: () => select('new') }, 'New meeting'),
+      group('Upcoming', up), group('Past', past));
+  }
+
+  function newMeetingForm() {
+    return h('form', { class: 'card form', onsubmit: (e) => { e.preventDefault(); createMeeting(); } },
+      h('h2', null, 'New meeting'),
+      h('label', null, 'Title', h('input', { id: 'draft-mtitle', value: 'BK117 check pilot meeting', maxLength: 200, required: true })),
+      h('div', { class: 'row' },
+        h('label', null, 'Date', h('input', { id: 'draft-mdate', type: 'date', required: true })),
+        h('label', null, 'Start time', h('input', { id: 'draft-mtime', type: 'time', value: '09:00', required: true }))),
+      h('label', null, 'Location or call link', h('input', { id: 'draft-mloc', maxLength: 200 })),
+      state.error && h('p', { class: 'error' }, state.error),
+      h('div', { class: 'row' },
+        h('button', { class: 'button primary', type: 'submit' }, 'Create meeting'),
+        h('button', { class: 'button', type: 'button', onclick: () => select(null) }, 'Cancel')));
+  }
+
+  function presenterSelect(id, value, onchange) {
+    return h('select', { id, value: value ?? '', onchange },
+      h('option', { value: '' }, 'None'),
+      sortedPilots().map((p) => h('option', { value: p.id }, p.name)));
+  }
+
+  function itemCard(item, start, locked, isFirst, isLast) {
+    const label = { open: 'Open', discussed: 'Discussed', carried: 'Carried' }[item.status] ?? item.status;
+    const top = h('div', { class: 'item-top' },
+      h('span', { class: 'item-time' }, start),
+      h('div', { class: 'item-main' },
+        h('div', { class: 'item-title' }, item.title),
+        h('div', { class: 'muted small' },
+          `${pilotName(item.presenterId) ?? 'No presenter'} · ${item.minutes} min`,
+          item.carriedFromDate ? ` · carried from ${formatDate(item.carriedFromDate)}` : '')),
+      h('span', { class: `badge ${item.status}` }, label));
+    if (locked || item.status === 'carried') {
+      return h('li', { class: `card item ${item.status}` }, top, item.notes ? h('p', { class: 'item-notes' }, item.notes) : null);
+    }
+    const delKey = `del-${item.id}`;
+    return h('li', { class: `card item ${item.status}` }, top,
+      h('div', { class: 'row item-edit' },
+        h('label', { class: 'small' }, 'Presenter',
+          presenterSelect(`pres-${item.id}`, item.presenterId, (e) => updateItem(item.id, { presenterId: e.target.value || null }))),
+        h('label', { class: 'small' }, 'Minutes',
+          h('input', { id: `min-${item.id}`, type: 'number', min: 1, max: 240, value: item.minutes, onchange: (e) => {
+            const n = Number(e.target.value);
+            if (Number.isInteger(n) && n >= 1 && n <= 240) updateItem(item.id, { minutes: n }); else e.target.value = item.minutes;
+          } }))),
+      h('textarea', { id: `notes-${item.id}`, placeholder: 'Notes', maxLength: 4000, value: item.notes || '',
+        'aria-label': `Notes for ${item.title}`,
+        onblur: (e) => { if (e.target.value !== (item.notes || '')) updateItem(item.id, { notes: e.target.value }); } }),
+      h('div', { class: 'row' },
+        h('button', { class: 'button primary', onclick: () => updateItem(item.id, { status: item.status === 'discussed' ? 'open' : 'discussed' }) },
+          item.status === 'discussed' ? 'Reopen' : 'Mark discussed'),
+        h('button', { class: 'button icon', 'aria-label': 'Move up', disabled: isFirst, onclick: () => move(item, 'up') }, '↑'),
+        h('button', { class: 'button icon', 'aria-label': 'Move down', disabled: isLast, onclick: () => move(item, 'down') }, '↓'),
+        h('button', { class: state.armed === delKey ? 'button armed' : 'button danger',
+          onclick: () => armed(delKey, () => write(() => state.db.doc(`items/${item.id}`).delete())) },
+          state.armed === delKey ? 'Tap again to delete' : 'Delete')));
+  }
+
+  function agenda(meeting) {
+    const list = itemsFor(meeting.id);
+    const total = list.reduce((s, i) => s + i.minutes, 0);
+    const held = meeting.status === 'held';
+    const locked = held || state.readOnly === true;
+    const open = list.filter((i) => i.status === 'open').length;
+    let clock = meeting.startTime;
+    const heldKey = `held-${meeting.id}`;
+
+    return h('section', null,
+      h('div', { class: 'agenda-header' },
+        h('div', null,
+          h('h2', null, meeting.title),
+          h('div', { class: 'muted' },
+            `${formatDate(meeting.date)} · ${meeting.startTime}–${addMinutes(meeting.startTime, total)} (${duration(total)})`,
+            meeting.location ? ` · ${meeting.location}` : '')),
+        held ? h('span', { class: 'badge' }, 'Held') : null),
+      state.error && h('p', { class: 'error' }, state.error),
+      state.notice && h('p', { class: 'notice' }, state.notice.text, ' ',
+        state.notice.meetingId && h('button', { class: 'link', onclick: () => select(state.notice.meetingId) }, 'Open it')),
+      h('ol', { class: 'agenda' }, list.map((item, idx) => {
+        const start = clock;
+        clock = addMinutes(clock, item.minutes);
+        return itemCard(item, start, locked, idx === 0, idx === list.length - 1);
+      })),
+      list.length === 0 ? h('p', { class: 'muted' }, 'No agenda items yet.') : null,
+      locked ? (held && list.some((i) => i.status === 'carried') ? h('p', { class: 'muted small' }, 'Items marked Carried moved to a later meeting.') : null) : [
+        h('form', { class: 'card form', onsubmit: (e) => { e.preventDefault(); addItem(meeting.id); } },
+          h('h3', null, 'Add agenda item'),
+          h('label', null, 'Topic', h('input', { id: 'draft-title', maxLength: 200, required: true })),
+          h('div', { class: 'row' },
+            h('label', null, 'Presenter', presenterSelect('draft-presenter', '', null)),
+            h('label', null, 'Minutes', h('input', { id: 'draft-minutes', type: 'number', min: 1, max: 240, value: 10, required: true }))),
+          h('div', { class: 'row' }, h('button', { class: 'button primary', type: 'submit' }, 'Add item'))),
+        h('div', { class: 'row actions' },
+          h('button', { class: 'button', disabled: open === 0, onclick: () => carryOver(meeting) },
+            `Carry ${plural(open, 'open item')} to next meeting`),
+          h('button', { class: state.armed === heldKey ? 'button armed' : 'button',
+            onclick: () => {
+              const run = () => write(() => state.db.doc(`meetings/${meeting.id}`).update({ status: 'held' }));
+              open ? armed(heldKey, run) : run();
+            } },
+            state.armed === heldKey ? `Tap again: ${plural(open, 'open item')} won't carry over` : 'Mark held')),
+      ]);
+  }
+
+  function select(id) {
+    state.selected = id;
+    state.error = null;
+    state.notice = null;
+    state.armed = null;
+    render();
+    window.scrollTo({ top: 0 });
+  }
+
+  function build() {
+    if (state.unavailable) {
+      return h('div', { class: 'main empty' },
+        h('h2', null, 'Sign in to see the team agenda'),
+        h('p', { class: 'muted' }, 'The agenda is shared between BK117 check pilots and loads only for signed-in viewers of this page on claude.ai.'));
+    }
+    if (!Object.values(state.loaded).every(Boolean)) return h('p', { class: 'main muted' }, 'Loading meetings…');
+
+    const { up, past } = sortedMeetings();
+    if (state.selected !== 'new' && !state.meetings.some((m) => m.id === state.selected)) state.selected = (up[0] ?? past[0])?.id ?? null;
+    const current = state.meetings.find((m) => m.id === state.selected);
+
+    return h('div', { class: 'layout' },
+      meetingList(),
+      h('main', { class: 'main' },
+        state.selected === 'new' ? newMeetingForm()
+          : current ? agenda(current)
+          : h('div', { class: 'empty' },
+              h('h2', null, 'No meetings yet'),
+              h('p', { class: 'muted' }, 'Tap New meeting to set the date, then add agenda items with a presenter and time for each.'))));
+  }
+
+  // Re-rendering keeps typed-but-unsaved text: drafts and whatever field has focus.
+  function render() {
+    const active = document.activeElement;
+    const focusId = active && root.contains(active) ? active.id : '';
+    const focusValue = focusId && active.tagName === 'TEXTAREA' ? active.value : null;
+    let selection = null;
+    try { if (focusId) selection = [active.selectionStart, active.selectionEnd]; } catch { /* number inputs */ }
+    const drafts = {};
+    root.querySelectorAll('[id^="draft-"]').forEach((e) => { drafts[e.id] = e.value; });
+
+    root.replaceChildren(build());
+
+    for (const [id, value] of Object.entries(drafts)) { const e = document.getElementById(id); if (e) e.value = value; }
+    const e = focusId && document.getElementById(focusId);
+    if (e) {
+      if (focusValue !== null) e.value = focusValue;
+      e.focus({ preventScroll: true });
+      try { if (selection && selection[0] != null) e.setSelectionRange(...selection); } catch { /* not a text field */ }
+    }
+  }
+
+  // ---------- start ----------
+  async function start() {
+    const db = window.claude?.use ? await window.claude.use('db') : null;
+    if (!db) { state.unavailable = true; render(); return; }
+    state.db = db;
+    const user = await window.claude.use('user');
+    const canWrite = user ? await user.can('data.write') : null;
+    state.readOnly = canWrite === false ? true : canWrite === true ? false : null;
+
+    const watch = (name) => db.collection(name).onSnapshot(
+      (snap) => {
+        state[name] = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        state.loaded[name] = true;
+        render();
+      },
+      () => { state.unavailable = true; render(); });
+    watch('pilots');
+    watch('meetings');
+    watch('items');
+  }
+  start();
+})();
+</script>
