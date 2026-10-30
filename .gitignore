@@ -1,0 +1,14 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+node_modules/
+dist/
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.log
+.DS_Store

@@ -1,0 +1,38 @@
+[
+  {
+    "title": "BK117 check pilot meeting (sample)",
+    "daysFromToday": -28,
+    "startTime": "09:00",
+    "location": "Sample training room / sample call link",
+    "status": "held",
+    "items": [
+      { "title": "Welcome and roll call", "presenter": "Jordan Sample (Lead CP)", "minutes": 5, "status": "discussed", "notes": "Sample note: all check pilots present." },
+      { "title": "Sample topic: checkride scheduling for next quarter", "presenter": "Riley Sample", "minutes": 20, "status": "discussed", "notes": "Sample note: draft schedule to be shared before next meeting." },
+      { "title": "Sample topic: simulator availability", "presenter": "Avery Sample", "minutes": 15, "status": "discussed", "notes": "" }
+    ]
+  },
+  {
+    "title": "BK117 check pilot meeting (sample)",
+    "daysFromToday": 3,
+    "startTime": "09:00",
+    "location": "Sample training room / sample call link",
+    "status": "upcoming",
+    "items": [
+      { "title": "Welcome and roll call", "presenter": "Jordan Sample (Lead CP)", "minutes": 5, "status": "open", "notes": "" },
+      { "title": "Sample topic: standardizing autorotation debrief", "presenter": "Quinn Sample", "minutes": 25, "status": "open", "notes": "" },
+      { "title": "Sample topic: gradesheet wording review", "presenter": "Drew Sample", "minutes": 20, "status": "open", "notes": "" },
+      { "title": "Sample topic: new check pilot observation plan", "presenter": "Riley Sample", "minutes": 15, "status": "open", "notes": "" },
+      { "title": "Round table", "presenter": null, "minutes": 10, "status": "open", "notes": "" }
+    ]
+  },
+  {
+    "title": "BK117 check pilot meeting (sample)",
+    "daysFromToday": 31,
+    "startTime": "09:00",
+    "location": "Sample training room / sample call link",
+    "status": "upcoming",
+    "items": [
+      { "title": "Welcome and roll call", "presenter": "Jordan Sample (Lead CP)", "minutes": 5, "status": "open", "notes": "" }
+    ]
+  }
+]
