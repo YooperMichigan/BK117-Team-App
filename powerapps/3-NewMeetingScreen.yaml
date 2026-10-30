@@ -1,0 +1,228 @@
+# BK117 Check Pilots: New Meeting screen.
+# Paste into NewMeetingScreen: select the screen in the Tree view, right-click, Paste code (or Ctrl+V).
+- rectBackground2:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(243, 242, 239, 1)
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+
+# ---------- Sidebar (same as the Meetings screen) ----------
+- rectSidebar2:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(22, 32, 44, 1)
+      X: =0
+      Y: =0
+      Width: =232
+      Height: =Parent.Height
+- lblKickerBrand2:
+    Control: Label
+    Properties:
+      Text: ="TRAINING DEPARTMENT"
+      X: =24
+      Y: =24
+      Width: =200
+      Height: =20
+      Size: =9
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(195, 203, 212, 1)
+- lblBrand2:
+    Control: Label
+    Properties:
+      Text: ="BK117 Check Pilots"
+      X: =24
+      Y: =44
+      Width: =200
+      Height: =60
+      Size: =18
+      FontWeight: =FontWeight.Bold
+      Color: =Color.White
+- btnNavMeetings2:
+    Control: Classic/Button
+    Properties:
+      Text: ="Meetings"
+      X: =16
+      Y: =116
+      Width: =200
+      Height: =46
+      Size: =13
+      FontWeight: =FontWeight.Semibold
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(42, 53, 66, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+      OnSelect: =Navigate(MeetingsScreen)
+
+# ---------- Form ----------
+- rectForm:
+    Control: Rectangle
+    Properties:
+      Fill: =Color.White
+      BorderColor: =RGBA(226, 224, 219, 1)
+      BorderThickness: =1
+      X: =264
+      Y: =24
+      Width: =560
+      Height: =420
+- lblNewTitle:
+    Control: Label
+    Properties:
+      Text: ="New meeting"
+      X: =288
+      Y: =40
+      Width: =500
+      Height: =40
+      Size: =20
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(22, 32, 44, 1)
+- lblMTitle:
+    Control: Label
+    Properties:
+      Text: ="Title"
+      X: =288
+      Y: =92
+      Width: =300
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(91, 100, 112, 1)
+- txtMTitle:
+    Control: Classic/TextInput
+    Properties:
+      Default: ="BK117 check pilot meeting"
+      X: =288
+      Y: =116
+      Width: =512
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- lblMDateLabel:
+    Control: Label
+    Properties:
+      Text: ="Date"
+      X: =288
+      Y: =172
+      Width: =240
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(91, 100, 112, 1)
+- dpMDate:
+    Control: Classic/DatePicker
+    Properties:
+      DefaultDate: =Today()
+      X: =288
+      Y: =196
+      Width: =260
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- lblMStartLabel:
+    Control: Label
+    Properties:
+      Text: ="Start time (HH:MM)"
+      X: =568
+      Y: =172
+      Width: =232
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(91, 100, 112, 1)
+- txtMStart:
+    Control: Classic/TextInput
+    Properties:
+      Default: ="09:00"
+      HintText: ="09:00"
+      X: =568
+      Y: =196
+      Width: =140
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- lblMLocationLabel:
+    Control: Label
+    Properties:
+      Text: ="Location or Teams link"
+      X: =288
+      Y: =252
+      Width: =300
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(91, 100, 112, 1)
+- txtMLocation:
+    Control: Classic/TextInput
+    Properties:
+      Default: =""
+      X: =288
+      Y: =276
+      Width: =512
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- btnCreate:
+    Control: Classic/Button
+    Properties:
+      Text: ="Create meeting"
+      X: =288
+      Y: =352
+      Width: =200
+      Height: =48
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Fill: =RGBA(232, 105, 31, 1)
+      HoverFill: =RGBA(210, 90, 20, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: |-
+        =If(
+            IsBlank(txtMTitle.Text) || !IsMatch(txtMStart.Text, "\d{2}:\d{2}"),
+            Notify("Enter a title and a start time like 09:00.", NotificationType.Warning),
+            Set(varMeeting, Patch(Meetings, Defaults(Meetings), {
+                Title: txtMTitle.Text,
+                MeetingDate: dpMDate.SelectedDate,
+                StartTime: txtMStart.Text,
+                Location: txtMLocation.Text,
+                Status: "Upcoming"
+            }));
+            Set(varArmed, "");
+            Reset(txtMLocation);
+            Navigate(MeetingsScreen)
+        )
+- btnCancel:
+    Control: Classic/Button
+    Properties:
+      Text: ="Cancel"
+      X: =504
+      Y: =352
+      Width: =140
+      Height: =48
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Fill: =Color.White
+      HoverFill: =RGBA(243, 242, 239, 1)
+      Color: =RGBA(22, 32, 44, 1)
+      HoverColor: =RGBA(22, 32, 44, 1)
+      BorderColor: =RGBA(22, 32, 44, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: =Navigate(MeetingsScreen)

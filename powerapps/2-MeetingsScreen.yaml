@@ -1,0 +1,622 @@
+# BK117 Check Pilots: Meetings screen.
+# Paste into MeetingsScreen: select the screen in the Tree view, right-click, Paste code (or Ctrl+V).
+# Needs the SharePoint lists CheckPilots, Meetings and AgendaItems connected, and App.OnStart from 1-App-OnStart.txt.
+- rectBackground:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(243, 242, 239, 1)
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+
+# ---------- Sidebar ----------
+- rectSidebar:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(22, 32, 44, 1)
+      X: =0
+      Y: =0
+      Width: =232
+      Height: =Parent.Height
+- lblKickerBrand:
+    Control: Label
+    Properties:
+      Text: ="TRAINING DEPARTMENT"
+      X: =24
+      Y: =24
+      Width: =200
+      Height: =20
+      Size: =9
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(195, 203, 212, 1)
+- lblBrand:
+    Control: Label
+    Properties:
+      Text: ="BK117 Check Pilots"
+      X: =24
+      Y: =44
+      Width: =200
+      Height: =60
+      Size: =18
+      FontWeight: =FontWeight.Bold
+      Color: =Color.White
+- btnNavMeetings:
+    Control: Classic/Button
+    Properties:
+      Text: ="Meetings"
+      X: =16
+      Y: =116
+      Width: =200
+      Height: =46
+      Size: =13
+      FontWeight: =FontWeight.Semibold
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(42, 53, 66, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+- lblSoon:
+    Control: Label
+    Properties:
+      Text: ="More sections to follow"
+      X: =28
+      Y: =168
+      Width: =190
+      Height: =24
+      Size: =10
+      Color: =RGBA(195, 203, 212, 1)
+
+# ---------- Empty state ----------
+- lblEmpty:
+    Control: Label
+    Properties:
+      Visible: =IsBlank(varMeeting)
+      Text: ="No meetings yet. Tap + New meeting to create the first one."
+      X: =264
+      Y: =40
+      Width: =700
+      Height: =40
+      Size: =14
+      Color: =RGBA(91, 100, 112, 1)
+
+# ---------- Meeting card ----------
+- rectHero:
+    Control: Rectangle
+    Properties:
+      Visible: =!IsBlank(varMeeting)
+      Fill: =RGBA(22, 32, 44, 1)
+      X: =264
+      Y: =24
+      Width: =1070
+      Height: =120
+- lblHeroKicker:
+    Control: Label
+    Properties:
+      Visible: =!IsBlank(varMeeting)
+      Text: =If(varMeeting.Status = "Held", "HELD MEETING", "UPCOMING MEETING")
+      X: =290
+      Y: =36
+      Width: =400
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(240, 160, 112, 1)
+- lblHeroTitle:
+    Control: Label
+    Properties:
+      Visible: =!IsBlank(varMeeting)
+      Text: |-
+        =Text(varMeeting.MeetingDate, "dddd, mmmm d") & " · " & varMeeting.StartTime & "–" &
+        Text(
+            DateAdd(
+                DateTimeValue(Text(varMeeting.MeetingDate, "yyyy-mm-dd") & " " & varMeeting.StartTime),
+                Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes),
+                TimeUnit.Minutes
+            ),
+            "hh:mm"
+        )
+      X: =290
+      Y: =58
+      Width: =640
+      Height: =36
+      Size: =18
+      FontWeight: =FontWeight.Bold
+      Color: =Color.White
+- lblHeroMeta:
+    Control: Label
+    Properties:
+      Visible: =!IsBlank(varMeeting)
+      Text: |-
+        =varMeeting.Title &
+        If(!IsBlank(varMeeting.Location), " · " & varMeeting.Location) &
+        " · " & CountRows(Filter(AgendaItems, MeetingID = varMeeting.ID)) & " items"
+      X: =290
+      Y: =98
+      Width: =640
+      Height: =28
+      Size: =11
+      Color: =RGBA(195, 203, 212, 1)
+- btnCarry:
+    Control: Classic/Button
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Text: ="Carry open items"
+      X: =950
+      Y: =62
+      Width: =180
+      Height: =44
+      Size: =12
+      FontWeight: =FontWeight.Bold
+      Fill: =RGBA(22, 32, 44, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      DisabledFill: =RGBA(22, 32, 44, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      DisabledColor: =RGBA(110, 120, 132, 1)
+      BorderColor: =Color.White
+      DisabledBorderColor: =RGBA(110, 120, 132, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      DisplayMode: |-
+        =If(
+            IsEmpty(Filter(AgendaItems, MeetingID = varMeeting.ID && Status = "Open")),
+            DisplayMode.Disabled,
+            DisplayMode.Edit
+        )
+      OnSelect: |-
+        =With(
+            {nextMeeting: First(Sort(
+                Filter(Meetings, Status = "Upcoming" && MeetingDate > varMeeting.MeetingDate),
+                MeetingDate, SortOrder.Ascending))},
+            If(
+                IsBlank(nextMeeting),
+                Notify("Create the next meeting first.", NotificationType.Warning),
+                With(
+                    {
+                        openItems: Sort(
+                            Filter(AgendaItems, MeetingID = varMeeting.ID && Status = "Open"),
+                            Position, SortOrder.Ascending),
+                        base: Max(Filter(AgendaItems, MeetingID = nextMeeting.ID), Position)
+                    },
+                    ForAll(Sequence(CountRows(openItems)) As n,
+                        With({item: Index(openItems, n.Value)},
+                            Patch(AgendaItems, Defaults(AgendaItems), {
+                                Title: item.Title,
+                                MeetingID: nextMeeting.ID,
+                                Position: If(IsBlank(base), 0, base) + n.Value,
+                                Presenter: item.Presenter,
+                                Minutes: item.Minutes,
+                                Status: "Open",
+                                CarriedFrom: varMeeting.MeetingDate
+                            })
+                        )
+                    );
+                    ForAll(openItems As o, Patch(AgendaItems, o, {Status: "Carried"}));
+                    Notify("Carried " & CountRows(openItems) & " items to " & Text(nextMeeting.MeetingDate, "mmm d"), NotificationType.Success)
+                )
+            )
+        )
+- btnHeld:
+    Control: Classic/Button
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Text: =If(varArmed = "held", "Tap again to confirm", "Mark held")
+      X: =1140
+      Y: =62
+      Width: =170
+      Height: =44
+      Size: =12
+      FontWeight: =FontWeight.Bold
+      Fill: =If(varArmed = "held", RGBA(179, 38, 30, 1), RGBA(232, 105, 31, 1))
+      HoverFill: =If(varArmed = "held", RGBA(179, 38, 30, 1), RGBA(210, 90, 20, 1))
+      PressedFill: =RGBA(180, 72, 15, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: |-
+        =If(
+            varArmed = "held",
+            Set(varMeeting, Patch(Meetings, varMeeting, {Status: "Held"}));
+            Set(varArmed, "");
+            Notify("Meeting marked held", NotificationType.Success),
+            Set(varArmed, "held")
+        )
+
+# ---------- Agenda ----------
+- rectAgendaPanel:
+    Control: Rectangle
+    Properties:
+      Visible: =!IsBlank(varMeeting)
+      Fill: =Color.White
+      BorderColor: =RGBA(226, 224, 219, 1)
+      BorderThickness: =1
+      X: =264
+      Y: =168
+      Width: =702
+      Height: =576
+- galAgenda:
+    Control: Gallery
+    Variant: Vertical
+    Properties:
+      Items: =Sort(Filter(AgendaItems, MeetingID = varMeeting.ID), Position, SortOrder.Ascending)
+      X: =265
+      Y: =169
+      Width: =700
+      Height: =574
+      TemplateSize: =204
+      TemplatePadding: =0
+      ShowScrollbar: =true
+    Children:
+      - lblTime:
+          Control: Label
+          Properties:
+            Text: |-
+              =Text(
+                  DateAdd(
+                      DateTimeValue(Text(varMeeting.MeetingDate, "yyyy-mm-dd") & " " & varMeeting.StartTime),
+                      Sum(Filter(AgendaItems, MeetingID = varMeeting.ID && Position < ThisItem.Position), Minutes),
+                      TimeUnit.Minutes
+                  ),
+                  "hh:mm"
+              )
+            X: =16
+            Y: =12
+            Width: =64
+            Height: =28
+            Size: =12
+            FontWeight: =FontWeight.Bold
+            Color: =RGBA(180, 72, 15, 1)
+      - lblTitle:
+          Control: Label
+          Properties:
+            Text: =ThisItem.Title
+            X: =84
+            Y: =10
+            Width: =480
+            Height: =30
+            Size: =13
+            FontWeight: =FontWeight.Semibold
+            Color: =RGBA(22, 32, 44, 1)
+      - lblSub:
+          Control: Label
+          Properties:
+            Text: |-
+              =If(IsBlank(ThisItem.Presenter), "No presenter", ThisItem.Presenter) & " · " & ThisItem.Minutes & " min" &
+              If(!IsBlank(ThisItem.CarriedFrom), " · carried from " & Text(ThisItem.CarriedFrom, "mmm d"))
+            X: =84
+            Y: =38
+            Width: =480
+            Height: =24
+            Size: =10
+            Color: =RGBA(91, 100, 112, 1)
+      - lblStatus:
+          Control: Label
+          Properties:
+            Text: =ThisItem.Status
+            X: =580
+            Y: =14
+            Width: =100
+            Height: =26
+            Size: =9
+            FontWeight: =FontWeight.Bold
+            Align: =Align.Center
+            Fill: =Switch(ThisItem.Status, "Discussed", RGBA(220, 239, 226, 1), "Carried", RGBA(251, 227, 212, 1), RGBA(229, 228, 223, 1))
+            Color: =Switch(ThisItem.Status, "Discussed", RGBA(31, 107, 58, 1), "Carried", RGBA(180, 72, 15, 1), RGBA(91, 100, 112, 1))
+      - txtNotes:
+          Control: Classic/TextInput
+          Properties:
+            Default: =ThisItem.Notes
+            HintText: ="Notes"
+            Mode: =TextMode.MultiLine
+            X: =84
+            Y: =70
+            Width: =600
+            Height: =66
+            Size: =11
+            BorderColor: =RGBA(226, 224, 219, 1)
+            DisplayMode: =If(varMeeting.Status = "Held" || ThisItem.Status = "Carried", DisplayMode.View, DisplayMode.Edit)
+            OnChange: |-
+              =Patch(AgendaItems, ThisItem, {Notes: Self.Text})
+      - btnDiscussed:
+          Control: Classic/Button
+          Properties:
+            Visible: =varMeeting.Status <> "Held" && ThisItem.Status <> "Carried"
+            Text: =If(ThisItem.Status = "Discussed", "Reopen", "Mark discussed")
+            X: =84
+            Y: =146
+            Width: =160
+            Height: =44
+            Size: =11
+            FontWeight: =FontWeight.Bold
+            Fill: =If(ThisItem.Status = "Discussed", Color.White, RGBA(232, 105, 31, 1))
+            HoverFill: =If(ThisItem.Status = "Discussed", RGBA(243, 242, 239, 1), RGBA(210, 90, 20, 1))
+            Color: =If(ThisItem.Status = "Discussed", RGBA(22, 32, 44, 1), Color.White)
+            HoverColor: =If(ThisItem.Status = "Discussed", RGBA(22, 32, 44, 1), Color.White)
+            BorderColor: =If(ThisItem.Status = "Discussed", RGBA(22, 32, 44, 1), RGBA(232, 105, 31, 1))
+            BorderThickness: =2
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            OnSelect: |-
+              =Patch(AgendaItems, ThisItem, {Status: If(ThisItem.Status = "Discussed", "Open", "Discussed")})
+      - btnUp:
+          Control: Classic/Button
+          Properties:
+            Visible: =varMeeting.Status <> "Held" && ThisItem.Status <> "Carried"
+            Text: ="↑"
+            X: =254
+            Y: =146
+            Width: =44
+            Height: =44
+            Size: =13
+            Fill: =Color.White
+            HoverFill: =RGBA(243, 242, 239, 1)
+            Color: =RGBA(22, 32, 44, 1)
+            HoverColor: =RGBA(22, 32, 44, 1)
+            BorderColor: =RGBA(22, 32, 44, 1)
+            BorderThickness: =2
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            OnSelect: |-
+              =With(
+                  {prev: First(Sort(
+                      Filter(AgendaItems, MeetingID = varMeeting.ID && Position < ThisItem.Position),
+                      Position, SortOrder.Descending))},
+                  If(!IsBlank(prev),
+                      Patch(AgendaItems, prev, {Position: ThisItem.Position});
+                      Patch(AgendaItems, ThisItem, {Position: prev.Position})
+                  )
+              )
+      - btnDown:
+          Control: Classic/Button
+          Properties:
+            Visible: =varMeeting.Status <> "Held" && ThisItem.Status <> "Carried"
+            Text: ="↓"
+            X: =306
+            Y: =146
+            Width: =44
+            Height: =44
+            Size: =13
+            Fill: =Color.White
+            HoverFill: =RGBA(243, 242, 239, 1)
+            Color: =RGBA(22, 32, 44, 1)
+            HoverColor: =RGBA(22, 32, 44, 1)
+            BorderColor: =RGBA(22, 32, 44, 1)
+            BorderThickness: =2
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            OnSelect: |-
+              =With(
+                  {following: First(Sort(
+                      Filter(AgendaItems, MeetingID = varMeeting.ID && Position > ThisItem.Position),
+                      Position, SortOrder.Ascending))},
+                  If(!IsBlank(following),
+                      Patch(AgendaItems, following, {Position: ThisItem.Position});
+                      Patch(AgendaItems, ThisItem, {Position: following.Position})
+                  )
+              )
+      - btnDelete:
+          Control: Classic/Button
+          Properties:
+            Visible: =varMeeting.Status <> "Held" && ThisItem.Status <> "Carried"
+            Text: =If(varArmed = "del" & ThisItem.ID, "Tap again to delete", "Delete")
+            X: =360
+            Y: =146
+            Width: =180
+            Height: =44
+            Size: =11
+            FontWeight: =FontWeight.Bold
+            Fill: =If(varArmed = "del" & ThisItem.ID, RGBA(179, 38, 30, 1), Color.White)
+            HoverFill: =If(varArmed = "del" & ThisItem.ID, RGBA(179, 38, 30, 1), RGBA(251, 235, 235, 1))
+            Color: =If(varArmed = "del" & ThisItem.ID, Color.White, RGBA(179, 38, 30, 1))
+            HoverColor: =If(varArmed = "del" & ThisItem.ID, Color.White, RGBA(179, 38, 30, 1))
+            BorderColor: =RGBA(179, 38, 30, 1)
+            BorderThickness: =2
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            OnSelect: |-
+              =If(
+                  varArmed = "del" & ThisItem.ID,
+                  Remove(AgendaItems, ThisItem); Set(varArmed, ""),
+                  Set(varArmed, "del" & ThisItem.ID)
+              )
+      - sepLine:
+          Control: Rectangle
+          Properties:
+            Fill: =RGBA(226, 224, 219, 1)
+            X: =16
+            Y: =203
+            Width: =668
+            Height: =1
+
+# ---------- Add agenda item ----------
+- rectAdd:
+    Control: Rectangle
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Fill: =Color.White
+      BorderColor: =RGBA(226, 224, 219, 1)
+      BorderThickness: =1
+      X: =990
+      Y: =168
+      Width: =344
+      Height: =262
+- lblAdd:
+    Control: Label
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Text: ="Add agenda item"
+      X: =1010
+      Y: =180
+      Width: =300
+      Height: =30
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(22, 32, 44, 1)
+- txtTopic:
+    Control: Classic/TextInput
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Default: =""
+      HintText: ="Topic"
+      X: =1010
+      Y: =218
+      Width: =304
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- ddPresenter:
+    Control: Classic/DropDown
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Items: |-
+        =ForAll(Sort(CheckPilots, ListOrder, SortOrder.Ascending), {Value: Title})
+      AllowEmptySelection: =true
+      Default: =""
+      X: =1010
+      Y: =272
+      Width: =200
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- txtMinutes:
+    Control: Classic/TextInput
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Default: ="10"
+      Format: =TextFormat.Number
+      X: =1220
+      Y: =272
+      Width: =94
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- btnAdd:
+    Control: Classic/Button
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Text: ="Add item"
+      X: =1010
+      Y: =336
+      Width: =304
+      Height: =48
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Fill: =RGBA(232, 105, 31, 1)
+      HoverFill: =RGBA(210, 90, 20, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: |-
+        =If(
+            IsBlank(txtTopic.Text) || IsBlank(Value(txtMinutes.Text)),
+            Notify("Enter a topic and the minutes.", NotificationType.Warning),
+            With({lastPos: Max(Filter(AgendaItems, MeetingID = varMeeting.ID), Position)},
+                Patch(AgendaItems, Defaults(AgendaItems), {
+                    Title: txtTopic.Text,
+                    MeetingID: varMeeting.ID,
+                    Position: If(IsBlank(lastPos), 0, lastPos) + 1,
+                    Presenter: ddPresenter.Selected.Value,
+                    Minutes: Value(txtMinutes.Text),
+                    Status: "Open"
+                })
+            );
+            Reset(txtTopic)
+        )
+
+# ---------- Meeting list ----------
+- lblMeetings:
+    Control: Label
+    Properties:
+      Text: ="All meetings"
+      X: =990
+      Y: =448
+      Width: =190
+      Height: =32
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(22, 32, 44, 1)
+- btnNewMeeting:
+    Control: Classic/Button
+    Properties:
+      Text: ="+ New meeting"
+      X: =1180
+      Y: =444
+      Width: =154
+      Height: =40
+      Size: =11
+      FontWeight: =FontWeight.Bold
+      Fill: =Color.White
+      HoverFill: =RGBA(251, 227, 212, 1)
+      Color: =RGBA(180, 72, 15, 1)
+      HoverColor: =RGBA(180, 72, 15, 1)
+      BorderColor: =RGBA(232, 105, 31, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: =Navigate(NewMeetingScreen)
+- galMeetings:
+    Control: Gallery
+    Variant: Vertical
+    Properties:
+      Items: =Sort(Meetings, MeetingDate, SortOrder.Descending)
+      X: =990
+      Y: =492
+      Width: =344
+      Height: =252
+      TemplateSize: =60
+      TemplatePadding: =0
+      Fill: =Color.White
+      TemplateFill: =If(ThisItem.ID = varMeeting.ID, RGBA(251, 227, 212, 1), Color.Transparent)
+      OnSelect: =Set(varMeeting, ThisItem); Set(varArmed, "")
+    Children:
+      - lblMDate:
+          Control: Label
+          Properties:
+            Text: =Text(ThisItem.MeetingDate, "ddd, mmm d, yyyy")
+            X: =14
+            Y: =6
+            Width: =310
+            Height: =26
+            Size: =12
+            FontWeight: =FontWeight.Semibold
+            Color: =RGBA(22, 32, 44, 1)
+      - lblMInfo:
+          Control: Label
+          Properties:
+            Text: =ThisItem.StartTime & " · " & ThisItem.Status
+            X: =14
+            Y: =30
+            Width: =310
+            Height: =24
+            Size: =10
+            Color: =RGBA(91, 100, 112, 1)
