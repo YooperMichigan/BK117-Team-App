@@ -14,3 +14,11 @@ Step-by-step instructions, including the SharePoint list columns, are in the bui
 The YAML uses Power Apps' paste-code format (classic controls). It was written without access
 to Power Apps, so a control type or property name may need a small fix the first time; the
 paste error names the line.
+
+## Status: paused (Oct 30, 2026)
+
+Trialled in the Air Methods tenant. The screens pasted and the layout rendered after removing
+the default ScreenContainer1, but the presenter drop-down stayed empty and Add item failed.
+Fixing it meant relaying every error between two computers, so the route was paused in favour of
+building where Claude can run and test the code (the claude.ai version in `hosted/`). For Teams,
+the preferred next step is asking IT about Power Apps code apps or a custom Teams app.
