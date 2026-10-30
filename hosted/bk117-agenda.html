@@ -1,128 +1,207 @@
 <title>BK117 Check Pilots</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: meeting list beside the agenda on a landscape iPad, stacked above it in portrait and on phones. */
+/* Layout: same family as Indoc Hub. Fixed navy sidebar + scrolling main column; sidebar becomes a top bar under 760px. */
 :root {
-  --bg: #f3f5f8;
+  --bg: #f3f2ef;
   --surface: #ffffff;
-  --text: #1a2330;
-  --muted: #5a6879;
-  --accent: #0b5cad;
-  --accent-text: #ffffff;
-  --border: #d6dce4;
-  --warn-bg: #fff4d6;
+  --text: #16202c;
+  --muted: #5b6470;
+  --border: #e2e0db;
+  --nav-bg: #16202c;
+  --nav-text: #c3cbd4;
+  --nav-active: #2a3542;
+  --accent: #e8691f;
+  --accent-text: #b4480f;
+  --accent-soft: #fbe3d4;
+  --ok: #1f6b3a;
+  --ok-soft: #dcefe2;
+  --track: #e5e4df;
+  --warn-bg: #fff3d1;
   --warn-text: #6b4b00;
-  --ok-bg: #e2f3e7;
-  --ok-text: #1d6b36;
-  --danger: #b8382a;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --danger: #b3261e;
+  --font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #11161d; --surface: #1a212b; --text: #e6eaf0; --muted: #9aa7b6; --accent: #5aa2ec; --accent-text: #0b1420;
-    --border: #2c3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --ok-bg: #173523; --ok-text: #8fdca9; --danger: #ef7b6e;
+    --bg: #0f161d; --surface: #18222d; --text: #e6eaf0; --muted: #9aa7b6; --border: #2a3542;
+    --nav-bg: #0a1016; --nav-active: #1f2a36; --accent-text: #f29a62; --accent-soft: #3a2418;
+    --ok: #5cc184; --ok-soft: #17301f; --track: #2a3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --danger: #f2827a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #11161d; --surface: #1a212b; --text: #e6eaf0; --muted: #9aa7b6; --accent: #5aa2ec; --accent-text: #0b1420;
-  --border: #2c3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --ok-bg: #173523; --ok-text: #8fdca9; --danger: #ef7b6e;
+  --bg: #0f161d; --surface: #18222d; --text: #e6eaf0; --muted: #9aa7b6; --border: #2a3542;
+  --nav-bg: #0a1016; --nav-active: #1f2a36; --accent-text: #f29a62; --accent-soft: #3a2418;
+  --ok: #5cc184; --ok-soft: #17301f; --track: #2a3542; --warn-bg: #3a2f10; --warn-text: #f3d78a; --danger: #f2827a;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; }
-.banner { background: var(--warn-bg); color: var(--warn-text); font-size: 14px; text-align: center; padding-block: 8px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-block: 12px; border-bottom: 1px solid var(--border);
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.header h1 { margin: 0; font-size: 22px; }
-h2 { margin: 0 0 4px; font-size: 20px; text-wrap: balance; }
-h3 { margin: 0; font-size: 17px; }
-
-.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); }
-.side { padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px;
-  border-right: 1px solid var(--border); display: grid; gap: 12px; align-content: start; }
-.main { padding-block: 16px; padding-left: 16px; padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 900px; min-width: 0; }
-@media (max-width: 900px) {
-  .layout { grid-template-columns: minmax(0, 1fr); }
-  .side { border-right: none; border-bottom: 1px solid var(--border); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-  .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); }
-}
-.list-heading { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 6px; }
-.meeting-link { display: grid; gap: 2px; width: 100%; text-align: left; min-height: 44px; padding: 8px 10px; margin-bottom: 6px;
-  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
-.meeting-link.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
-.meeting-date { font-weight: 600; }
-
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-.agenda-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-.agenda { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 10px; }
-.item { display: grid; gap: 10px; }
-.item.discussed { box-shadow: inset 4px 0 0 var(--ok-text); }
-.item.carried { opacity: 0.7; }
-.item-top { display: flex; gap: 12px; align-items: flex-start; }
-.item-time { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); min-width: 48px; }
-.item-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.item-title { font-weight: 600; }
-.item-notes { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.badge { font-size: 13px; padding: 3px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
-.badge.discussed { background: var(--ok-bg); color: var(--ok-text); border-color: transparent; }
-
-.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
-.actions { margin-top: 16px; }
-.form { display: grid; gap: 10px; margin-top: 8px; }
-label { display: grid; gap: 4px; font-size: 15px; color: var(--muted); flex: 1 1 160px; min-width: 0; }
-.item-edit label { flex: 0 1 220px; }
-input, select, textarea { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 10px; color: var(--text);
-  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 100%; min-width: 0; }
-textarea { min-height: 72px; resize: vertical; }
-.button { min-height: 44px; padding: 0 16px; font: inherit; font-size: 16px; border-radius: 8px; cursor: pointer;
-  background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-.button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-.button.danger { color: var(--danger); }
-.button.armed { background: var(--danger); color: var(--surface); border-color: var(--danger); }
-.button.icon { min-width: 44px; padding: 0; }
-.button.block { width: 100%; }
-.button:disabled { opacity: 0.45; cursor: default; }
-.link { background: none; border: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h2 { margin: 0; font-size: 28px; line-height: 1.2; text-wrap: balance; }
+h3 { margin: 0; font-size: 18px; text-wrap: balance; }
+p { margin: 0; }
 .muted { color: var(--muted); }
-.small { font-size: 14px; }
-.error { color: var(--danger); }
-.notice { background: var(--ok-bg); color: var(--ok-text); padding: 8px 12px; border-radius: 8px; }
-.empty { padding-block: 24px; }
+.small { font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 232px; flex-shrink: 0; background: var(--nav-bg); color: var(--nav-text);
+  display: flex; flex-direction: column; gap: 18px; padding: 24px 16px 16px max(16px, env(safe-area-inset-left, 0px));
+  position: sticky; top: 0; height: 100vh;
+}
+.brand { padding: 0 8px; }
+.brand-kicker { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+.brand-name { font-size: 22px; font-weight: 700; color: #fff; }
+.nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }
+.nav a {
+  display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border-radius: 8px;
+  color: var(--nav-text); text-decoration: none; font-size: 15.5px;
+}
+.nav a:hover { color: #fff; }
+.nav svg { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.nav a.active { background: var(--nav-active); color: #fff; font-weight: 600; }
+.nav .soon { padding: 10px 12px; font-size: 13px; opacity: 0.7; }
+.sidebar-footer { border-top: 1px solid #2c3846; padding: 14px 8px 0; font-size: 14px; display: grid; gap: 4px; }
+.who { color: #fff; font-weight: 600; }
+
+.main { flex: 1; min-width: 0; }
+.banner { background: var(--warn-bg); color: var(--warn-text); font-size: 14px; text-align: center; padding: 8px 16px; }
+.content { padding-block: 28px 40px; padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); max-width: 1120px; display: grid; gap: 24px; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.page-head > div { display: grid; gap: 4px; min-width: 0; }
+
+@media (max-width: 900px) and (min-width: 761px) { .sidebar { width: 204px; } .content { padding-left: 24px; padding-right: 24px; } }
+@media (max-width: 760px) {
+  .app { flex-direction: column; }
+  .sidebar { width: auto; height: auto; position: static; padding: 14px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); gap: 10px; }
+  .nav { flex-direction: row; overflow-x: auto; }
+  .nav a { white-space: nowrap; }
+  .nav .soon, .sidebar-footer { display: none; }
+  .content { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 32px; }
+}
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.stack { display: grid; gap: 24px; align-content: start; min-width: 0; }
+@media (max-width: 1000px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.btn { min-height: 48px; padding: 0 22px; border-radius: 10px; font-weight: 700; border: 2px solid var(--text); background: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.small { min-height: 44px; padding: 0 14px; font-size: 14px; border-width: 1.5px; }
+.btn.block { width: 100%; }
+.btn.icon { min-width: 44px; padding: 0; }
+.btn.danger { color: var(--danger); border-color: var(--danger); }
+.btn.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn.on-dark { color: #fff; border-color: #fff; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.link { background: none; border: none; color: var(--accent-text); font-weight: 600; font-size: 14px; min-height: 44px; padding: 0; }
+.input { width: 100%; min-width: 0; min-height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+textarea.input { padding: 12px 14px; min-height: 80px; resize: vertical; }
+label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--muted); flex: 1 1 160px; min-width: 0; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+
+/* Meeting hero */
+.next-up { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--nav-bg); color: #fff; border-radius: 14px; padding: 24px 28px; }
+.next-up > div { display: grid; gap: 6px; min-width: 0; }
+.kicker { color: #f0a070; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.next-title { font-size: 24px; font-weight: 700; text-wrap: balance; }
+.next-meta { font-size: 14px; color: var(--nav-text); }
+.next-up > .row { display: flex; align-items: center; }
+
+/* Agenda */
+.agenda { list-style: none; margin: 0; padding: 0; display: grid; }
+.item { display: grid; gap: 12px; padding-block: 16px; border-bottom: 1px solid var(--border); }
+.item:last-child { border-bottom: none; padding-bottom: 0; }
+.item:first-child { padding-top: 4px; }
+.item-top { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.item-time { font-family: var(--mono); font-size: 14px; color: var(--accent-text); padding-top: 2px; }
+.item-title { font-weight: 600; overflow-wrap: anywhere; }
+.item-notes { white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 68px; }
+.item-body { display: grid; gap: 10px; padding-left: 68px; }
+.item.carried { opacity: 0.65; }
+.item-edit label { flex: 1 1 180px; max-width: 260px; }
+.item-edit label.minutes { flex: 0 1 100px; }
+@media (max-width: 560px) { .item-top { grid-template-columns: 48px minmax(0, 1fr); } .item-top .tag { grid-column: 2; justify-self: start; } .item-body, .item-notes { padding-left: 0; } }
+.tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: var(--track); color: var(--muted); white-space: nowrap; }
+.tag.ok { background: var(--ok-soft); color: var(--ok); }
+.tag.new { background: var(--accent-soft); color: var(--accent-text); }
+.bar { height: 8px; background: var(--track); border-radius: 4px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--ok); border-radius: 4px; }
+
+/* Meeting list */
+.subhead { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.mlist { display: grid; }
+.mlink { display: grid; gap: 2px; text-align: left; min-height: 56px; padding: 10px 12px; border: none; border-bottom: 1px solid var(--border); background: none; border-radius: 0; }
+.mlink:last-child { border-bottom: none; }
+.mlink.active { background: var(--accent-soft); border-radius: 10px; border-bottom-color: transparent; }
+.mlink strong { font-weight: 600; }
+.empty { display: grid; gap: 8px; padding: 8px 0; }
+.error { color: var(--danger); font-weight: 600; }
+.toast { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--nav-bg); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 14px; z-index: 20; max-width: calc(100vw - 40px); }
 </style>
 
-<div class="banner">Proof of concept. All content is sample data, not Air Methods records.</div>
-<header class="header">
-  <h1>BK117 Check Pilots</h1>
-  <span class="muted">Team meeting agenda</span>
-</header>
-<div id="root"><p class="main muted">Loading meetings…</p></div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-kicker">Training department</div><div class="brand-name">BK117 Check Pilots</div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-footer">
+      <div class="who">Team workspace</div>
+      <div>Shared with the BK117 check pilots. Changes show for everyone live.</div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="banner">Proof of concept. Every check pilot, meeting and agenda item here is invented sample data, not Air Methods records.</div>
+    <main class="content" id="view"><p class="muted">Loading meetings…</p></main>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
 
 <script>
 (() => {
-  const root = document.getElementById('root');
+  // Sections in the sidebar. More are added here as the team asks for them.
+  const SECTIONS = [
+    { id: 'meetings', label: 'Meetings', icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h5' },
+  ];
+
+  const view = document.getElementById('view');
   const state = {
-    db: null, unavailable: false, readOnly: false,
+    db: null, unavailable: false, readOnly: null,
     pilots: [], meetings: [], items: [], loaded: { pilots: false, meetings: false, items: false },
-    selected: null, error: null, notice: null, armed: null,
+    selected: null, error: null, armed: null,
   };
 
   // ---------- formatting ----------
   const pad = (n) => String(n).padStart(2, '0');
-  function formatDate(iso) {
+  function formatDate(iso, opts = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) {
     const [y, m, d] = String(iso).split('-').map(Number);
     if (!y || !m || !d) return iso;
-    return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, opts);
   }
   function addMinutes(time, minutes) {
     const [h, m] = String(time).split(':').map(Number);
     const total = (((h || 0) * 60 + (m || 0) + minutes) % 1440 + 1440) % 1440;
     return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
   }
-  const duration = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} min`);
+  const duration = (min) => (min >= 60 ? `${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ''}` : `${min} min`);
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => { t.hidden = true; }, 2800);
+  }
 
   // ---------- data helpers ----------
   const sortKey = (m) => `${m.date}T${m.startTime}`;
@@ -132,6 +211,7 @@ textarea { min-height: 72px; resize: vertical; }
     return { up, past };
   }
   const itemsFor = (meetingId) => state.items.filter((i) => i.meetingId === meetingId).sort((a, b) => a.position - b.position);
+  const totalFor = (meetingId) => itemsFor(meetingId).reduce((s, i) => s + i.minutes, 0);
   const pilotName = (id) => state.pilots.find((p) => p.id === id)?.name ?? null;
   const sortedPilots = () => [...state.pilots].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
@@ -150,18 +230,23 @@ textarea { min-height: 72px; resize: vertical; }
   }
 
   // ---------- writes ----------
-  async function write(fn) {
+  async function write(fn, done) {
     state.error = null;
-    try { await fn(); } catch (e) {
-      state.error = e?.code === 'invalid_argument' && state.readOnly === null
-        ? 'You can view this agenda but not change it. Ask the owner for Contributor access.'
-        : `Could not save: ${e?.message || 'unknown error'}. Try again.`;
-      if (e?.code === 'invalid_argument' && state.readOnly === null) state.readOnly = true;
+    try {
+      await fn();
+      if (done) toast(done);
+    } catch (e) {
+      if (e?.code === 'invalid_argument' && state.readOnly === null) {
+        state.readOnly = true;
+        state.error = 'You can view this agenda but not change it. Ask the owner for Contributor access.';
+      } else {
+        state.error = `Could not save: ${e?.message || 'unknown error'}. Try again.`;
+      }
     }
     render();
   }
   const items = () => state.db.collection('items');
-  const updateItem = (id, patch) => write(() => state.db.doc(`items/${id}`).update(patch));
+  const updateItem = (id, patch, done) => write(() => state.db.doc(`items/${id}`).update(patch), done);
 
   // Two taps for destructive actions: the first arms the button, the second runs it.
   function armed(key, run) {
@@ -182,7 +267,7 @@ textarea { min-height: 72px; resize: vertical; }
     await write(async () => {
       const ref = await state.db.collection('meetings').add({ title, date, startTime, location, status: 'upcoming' });
       state.selected = ref.id;
-    });
+    }, 'Meeting created');
   }
 
   async function addItem(meetingId) {
@@ -195,7 +280,7 @@ textarea { min-height: 72px; resize: vertical; }
       return;
     }
     const position = Math.max(0, ...itemsFor(meetingId).map((i) => i.position)) + 1;
-    await write(() => items().add({ meetingId, position, title, presenterId: presenter || null, minutes, notes: '', status: 'open', carriedFromDate: null }));
+    await write(() => items().add({ meetingId, position, title, presenterId: presenter || null, minutes, notes: '', status: 'open', carriedFromDate: null }), 'Item added');
     if (!state.error) document.getElementById('draft-title').value = '';
   }
 
@@ -211,8 +296,7 @@ textarea { min-height: 72px; resize: vertical; }
 
   // Copies every open item to the next upcoming meeting and marks the originals carried.
   function carryOver(meeting) {
-    const { up } = sortedMeetings();
-    const next = up.find((m) => m.id !== meeting.id && sortKey(m) > sortKey(meeting));
+    const next = sortedMeetings().up.find((m) => m.id !== meeting.id && sortKey(m) > sortKey(meeting));
     if (!next) {
       state.error = 'There is no later meeting to carry items to. Create the next meeting first.';
       render();
@@ -227,172 +311,213 @@ textarea { min-height: 72px; resize: vertical; }
           notes: '', status: 'open', carriedFromDate: meeting.date });
         await state.db.doc(`items/${i.id}`).update({ status: 'carried' });
       }
-      state.notice = { text: `Carried ${plural(open.length, 'item')} to ${formatDate(next.date)}.`, meetingId: next.id };
-    });
+    }, `Carried ${plural(open.length, 'item')} to ${formatDate(next.date)}`);
   }
 
   // ---------- views ----------
-  function meetingList() {
-    const { up, past } = sortedMeetings();
-    const link = (m) => {
-      const list = itemsFor(m.id);
-      const total = list.reduce((s, i) => s + i.minutes, 0);
-      return h('button', { class: m.id === state.selected ? 'meeting-link active' : 'meeting-link', onclick: () => select(m.id) },
-        h('span', { class: 'meeting-date' }, formatDate(m.date)),
-        h('span', { class: 'muted small' }, `${m.startTime} · ${plural(list.length, 'item')} · ${duration(total)}`));
-    };
-    const group = (label, list) => h('section', null,
-      h('h2', { class: 'list-heading' }, label),
-      list.length ? list.map(link) : h('p', { class: 'muted small' }, 'None'));
-    return h('nav', { class: 'side', 'aria-label': 'Meetings' },
-      state.readOnly === true ? null : h('button', { class: 'button primary block', onclick: () => select('new') }, 'New meeting'),
-      group('Upcoming', up), group('Past', past));
-  }
-
-  function newMeetingForm() {
-    return h('form', { class: 'card form', onsubmit: (e) => { e.preventDefault(); createMeeting(); } },
-      h('h2', null, 'New meeting'),
-      h('label', null, 'Title', h('input', { id: 'draft-mtitle', value: 'BK117 check pilot meeting', maxLength: 200, required: true })),
-      h('div', { class: 'row' },
-        h('label', null, 'Date', h('input', { id: 'draft-mdate', type: 'date', required: true })),
-        h('label', null, 'Start time', h('input', { id: 'draft-mtime', type: 'time', value: '09:00', required: true }))),
-      h('label', null, 'Location or call link', h('input', { id: 'draft-mloc', maxLength: 200 })),
-      state.error && h('p', { class: 'error' }, state.error),
-      h('div', { class: 'row' },
-        h('button', { class: 'button primary', type: 'submit' }, 'Create meeting'),
-        h('button', { class: 'button', type: 'button', onclick: () => select(null) }, 'Cancel')));
-  }
-
   function presenterSelect(id, value, onchange) {
-    return h('select', { id, value: value ?? '', onchange },
+    return h('select', { id, class: 'input', value: value ?? '', onchange },
       h('option', { value: '' }, 'None'),
       sortedPilots().map((p) => h('option', { value: p.id }, p.name)));
   }
 
-  function itemCard(item, start, locked, isFirst, isLast) {
+  function hero(meeting) {
+    const list = itemsFor(meeting.id);
+    const total = totalFor(meeting.id);
+    const held = meeting.status === 'held';
+    const isNext = sortedMeetings().up[0]?.id === meeting.id;
+    const open = list.filter((i) => i.status === 'open').length;
+    const heldKey = `held-${meeting.id}`;
+    const canAct = !held && state.readOnly !== true;
+    return h('div', { class: 'next-up' },
+      h('div', null,
+        h('div', { class: 'kicker' }, held ? 'Held meeting' : isNext ? 'Next meeting' : 'Upcoming meeting'),
+        h('div', { class: 'next-title' }, `${formatDate(meeting.date, { weekday: 'long', month: 'long', day: 'numeric' })} · ${meeting.startTime}–${addMinutes(meeting.startTime, total)}`),
+        h('div', { class: 'next-meta' }, [meeting.title, meeting.location, `${plural(list.length, 'item')} · ${duration(total)}`].filter(Boolean).join(' · '))),
+      canAct ? h('div', { class: 'row' },
+        h('button', { class: 'btn small on-dark', disabled: open === 0, onclick: () => carryOver(meeting) },
+          `Carry ${plural(open, 'open item')} forward`),
+        h('button', { class: state.armed === heldKey ? 'btn armed' : 'btn primary',
+          onclick: () => {
+            const run = () => write(() => state.db.doc(`meetings/${meeting.id}`).update({ status: 'held' }), 'Meeting marked held');
+            open ? armed(heldKey, run) : run();
+          } },
+          state.armed === heldKey ? `Tap again: ${plural(open, 'open item')} won't carry` : 'Mark held')) : null);
+  }
+
+  function itemRow(item, start, locked, isFirst, isLast) {
     const label = { open: 'Open', discussed: 'Discussed', carried: 'Carried' }[item.status] ?? item.status;
+    const tagClass = item.status === 'discussed' ? 'tag ok' : item.status === 'carried' ? 'tag new' : 'tag';
     const top = h('div', { class: 'item-top' },
       h('span', { class: 'item-time' }, start),
-      h('div', { class: 'item-main' },
+      h('div', null,
         h('div', { class: 'item-title' }, item.title),
         h('div', { class: 'muted small' },
           `${pilotName(item.presenterId) ?? 'No presenter'} · ${item.minutes} min`,
-          item.carriedFromDate ? ` · carried from ${formatDate(item.carriedFromDate)}` : '')),
-      h('span', { class: `badge ${item.status}` }, label));
+          item.carriedFromDate ? ` · carried from ${formatDate(item.carriedFromDate, { month: 'short', day: 'numeric' })}` : '')),
+      h('span', { class: tagClass }, label));
     if (locked || item.status === 'carried') {
-      return h('li', { class: `card item ${item.status}` }, top, item.notes ? h('p', { class: 'item-notes' }, item.notes) : null);
+      return h('li', { class: `item ${item.status}` }, top, item.notes ? h('p', { class: 'item-notes' }, item.notes) : null);
     }
     const delKey = `del-${item.id}`;
-    return h('li', { class: `card item ${item.status}` }, top,
-      h('div', { class: 'row item-edit' },
-        h('label', { class: 'small' }, 'Presenter',
-          presenterSelect(`pres-${item.id}`, item.presenterId, (e) => updateItem(item.id, { presenterId: e.target.value || null }))),
-        h('label', { class: 'small' }, 'Minutes',
-          h('input', { id: `min-${item.id}`, type: 'number', min: 1, max: 240, value: item.minutes, onchange: (e) => {
-            const n = Number(e.target.value);
-            if (Number.isInteger(n) && n >= 1 && n <= 240) updateItem(item.id, { minutes: n }); else e.target.value = item.minutes;
-          } }))),
-      h('textarea', { id: `notes-${item.id}`, placeholder: 'Notes', maxLength: 4000, value: item.notes || '',
-        'aria-label': `Notes for ${item.title}`,
-        onblur: (e) => { if (e.target.value !== (item.notes || '')) updateItem(item.id, { notes: e.target.value }); } }),
-      h('div', { class: 'row' },
-        h('button', { class: 'button primary', onclick: () => updateItem(item.id, { status: item.status === 'discussed' ? 'open' : 'discussed' }) },
-          item.status === 'discussed' ? 'Reopen' : 'Mark discussed'),
-        h('button', { class: 'button icon', 'aria-label': 'Move up', disabled: isFirst, onclick: () => move(item, 'up') }, '↑'),
-        h('button', { class: 'button icon', 'aria-label': 'Move down', disabled: isLast, onclick: () => move(item, 'down') }, '↓'),
-        h('button', { class: state.armed === delKey ? 'button armed' : 'button danger',
-          onclick: () => armed(delKey, () => write(() => state.db.doc(`items/${item.id}`).delete())) },
-          state.armed === delKey ? 'Tap again to delete' : 'Delete')));
+    return h('li', { class: `item ${item.status}` }, top,
+      h('div', { class: 'item-body' },
+        h('div', { class: 'row item-edit' },
+          h('label', null, 'Presenter',
+            presenterSelect(`pres-${item.id}`, item.presenterId, (e) => updateItem(item.id, { presenterId: e.target.value || null }))),
+          h('label', { class: 'minutes' }, 'Minutes',
+            h('input', { id: `min-${item.id}`, class: 'input', type: 'number', min: 1, max: 240, value: item.minutes, onchange: (e) => {
+              const n = Number(e.target.value);
+              if (Number.isInteger(n) && n >= 1 && n <= 240) updateItem(item.id, { minutes: n }); else e.target.value = item.minutes;
+            } }))),
+        h('textarea', { id: `notes-${item.id}`, class: 'input', placeholder: 'Notes', maxLength: 4000, value: item.notes || '',
+          'aria-label': `Notes for ${item.title}`,
+          onblur: (e) => { if (e.target.value !== (item.notes || '')) updateItem(item.id, { notes: e.target.value }, 'Notes saved'); } }),
+        h('div', { class: 'row' },
+          h('button', { class: item.status === 'discussed' ? 'btn small' : 'btn small primary',
+            onclick: () => updateItem(item.id, { status: item.status === 'discussed' ? 'open' : 'discussed' }) },
+            item.status === 'discussed' ? 'Reopen' : 'Mark discussed'),
+          h('button', { class: 'btn small icon', 'aria-label': 'Move up', disabled: isFirst, onclick: () => move(item, 'up') }, '↑'),
+          h('button', { class: 'btn small icon', 'aria-label': 'Move down', disabled: isLast, onclick: () => move(item, 'down') }, '↓'),
+          h('button', { class: state.armed === delKey ? 'btn small armed' : 'btn small danger',
+            onclick: () => armed(delKey, () => write(() => state.db.doc(`items/${item.id}`).delete(), 'Item deleted')) },
+            state.armed === delKey ? 'Tap again to delete' : 'Delete'))));
   }
 
-  function agenda(meeting) {
+  function agendaPanel(meeting) {
     const list = itemsFor(meeting.id);
-    const total = list.reduce((s, i) => s + i.minutes, 0);
     const held = meeting.status === 'held';
     const locked = held || state.readOnly === true;
-    const open = list.filter((i) => i.status === 'open').length;
+    const done = list.filter((i) => i.status !== 'open').length;
     let clock = meeting.startTime;
-    const heldKey = `held-${meeting.id}`;
+    return h('div', { class: 'panel' },
+      h('div', { class: 'panel-head' },
+        h('h3', null, 'Agenda'),
+        h('span', { class: 'muted small' }, list.length ? `${done} of ${list.length} covered` : '')),
+      list.length ? h('div', { class: 'bar' }, h('span', { style: `width:${Math.round((done / list.length) * 100)}%` })) : null,
+      list.length
+        ? h('ol', { class: 'agenda' }, list.map((item, idx) => {
+            const start = clock;
+            clock = addMinutes(clock, item.minutes);
+            return itemRow(item, start, locked, idx === 0, idx === list.length - 1);
+          }))
+        : h('p', { class: 'muted' }, locked ? 'No items were recorded for this meeting.' : 'No agenda items yet. Add the first one on the right.'),
+      held && list.some((i) => i.status === 'carried') ? h('p', { class: 'muted small' }, 'Items tagged Carried moved to a later meeting.') : null);
+  }
 
-    return h('section', null,
-      h('div', { class: 'agenda-header' },
-        h('div', null,
-          h('h2', null, meeting.title),
-          h('div', { class: 'muted' },
-            `${formatDate(meeting.date)} · ${meeting.startTime}–${addMinutes(meeting.startTime, total)} (${duration(total)})`,
-            meeting.location ? ` · ${meeting.location}` : '')),
-        held ? h('span', { class: 'badge' }, 'Held') : null),
-      state.error && h('p', { class: 'error' }, state.error),
-      state.notice && h('p', { class: 'notice' }, state.notice.text, ' ',
-        state.notice.meetingId && h('button', { class: 'link', onclick: () => select(state.notice.meetingId) }, 'Open it')),
-      h('ol', { class: 'agenda' }, list.map((item, idx) => {
-        const start = clock;
-        clock = addMinutes(clock, item.minutes);
-        return itemCard(item, start, locked, idx === 0, idx === list.length - 1);
-      })),
-      list.length === 0 ? h('p', { class: 'muted' }, 'No agenda items yet.') : null,
-      locked ? (held && list.some((i) => i.status === 'carried') ? h('p', { class: 'muted small' }, 'Items marked Carried moved to a later meeting.') : null) : [
-        h('form', { class: 'card form', onsubmit: (e) => { e.preventDefault(); addItem(meeting.id); } },
-          h('h3', null, 'Add agenda item'),
-          h('label', null, 'Topic', h('input', { id: 'draft-title', maxLength: 200, required: true })),
-          h('div', { class: 'row' },
-            h('label', null, 'Presenter', presenterSelect('draft-presenter', '', null)),
-            h('label', null, 'Minutes', h('input', { id: 'draft-minutes', type: 'number', min: 1, max: 240, value: 10, required: true }))),
-          h('div', { class: 'row' }, h('button', { class: 'button primary', type: 'submit' }, 'Add item'))),
-        h('div', { class: 'row actions' },
-          h('button', { class: 'button', disabled: open === 0, onclick: () => carryOver(meeting) },
-            `Carry ${plural(open, 'open item')} to next meeting`),
-          h('button', { class: state.armed === heldKey ? 'button armed' : 'button',
-            onclick: () => {
-              const run = () => write(() => state.db.doc(`meetings/${meeting.id}`).update({ status: 'held' }));
-              open ? armed(heldKey, run) : run();
-            } },
-            state.armed === heldKey ? `Tap again: ${plural(open, 'open item')} won't carry over` : 'Mark held')),
-      ]);
+  function meetingsPanel() {
+    const { up, past } = sortedMeetings();
+    const link = (m) => h('button', { class: m.id === state.selected ? 'mlink active' : 'mlink', onclick: () => select(m.id) },
+      h('strong', null, formatDate(m.date)),
+      h('span', { class: 'muted small' }, `${m.startTime} · ${plural(itemsFor(m.id).length, 'item')} · ${duration(totalFor(m.id))}`));
+    return h('div', { class: 'panel' },
+      h('div', { class: 'panel-head' }, h('h3', null, 'All meetings'),
+        state.readOnly === true ? null : h('button', { class: 'link', onclick: () => select('new') }, '+ New meeting')),
+      h('div', { class: 'subhead' }, 'Upcoming'),
+      h('div', { class: 'mlist' }, up.length ? up.map(link) : h('p', { class: 'muted small' }, 'None scheduled')),
+      h('div', { class: 'subhead' }, 'Past'),
+      h('div', { class: 'mlist' }, past.length ? past.map(link) : h('p', { class: 'muted small' }, 'None yet')));
+  }
+
+  function addItemPanel(meeting) {
+    return h('form', { class: 'panel', onsubmit: (e) => { e.preventDefault(); addItem(meeting.id); } },
+      h('h3', null, 'Add agenda item'),
+      h('label', null, 'Topic', h('input', { id: 'draft-title', class: 'input', maxLength: 200, required: true })),
+      h('div', { class: 'row' },
+        h('label', null, 'Presenter', presenterSelect('draft-presenter', '', null)),
+        h('label', { style: 'flex: 0 1 110px' }, 'Minutes', h('input', { id: 'draft-minutes', class: 'input', type: 'number', min: 1, max: 240, value: 10, required: true }))),
+      h('button', { class: 'btn primary block', type: 'submit' }, 'Add item'));
+  }
+
+  function newMeetingPanel() {
+    return h('form', { class: 'panel', onsubmit: (e) => { e.preventDefault(); createMeeting(); } },
+      h('h3', null, 'New meeting'),
+      h('label', null, 'Title', h('input', { id: 'draft-mtitle', class: 'input', value: 'BK117 check pilot meeting', maxLength: 200, required: true })),
+      h('div', { class: 'row' },
+        h('label', null, 'Date', h('input', { id: 'draft-mdate', class: 'input', type: 'date', required: true })),
+        h('label', null, 'Start time', h('input', { id: 'draft-mtime', class: 'input', type: 'time', value: '09:00', required: true }))),
+      h('label', null, 'Location or call link', h('input', { id: 'draft-mloc', class: 'input', maxLength: 200 })),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn primary', type: 'submit' }, 'Create meeting'),
+        h('button', { class: 'btn', type: 'button', onclick: () => select(null) }, 'Cancel')));
+  }
+
+  function meetingsView() {
+    const { up, past } = sortedMeetings();
+    if (state.selected !== 'new' && !state.meetings.some((m) => m.id === state.selected)) state.selected = (up[0] ?? past[0])?.id ?? null;
+    const current = state.meetings.find((m) => m.id === state.selected);
+    const canWrite = state.readOnly !== true;
+
+    const head = h('div', { class: 'page-head' },
+      h('div', null, h('h2', null, 'Meetings'),
+        h('p', { class: 'muted' }, 'Team meeting agendas: who presents what, for how long, and what was covered.')),
+      canWrite && state.selected !== 'new' ? h('button', { class: 'btn small', onclick: () => select('new') }, 'New meeting') : null);
+
+    let body;
+    if (state.selected === 'new') {
+      body = h('div', { class: 'grid-2' }, newMeetingPanel(), meetingsPanel());
+    } else if (current) {
+      const locked = current.status === 'held' || !canWrite;
+      body = [hero(current), h('div', { class: 'grid-2' }, agendaPanel(current),
+        h('div', { class: 'stack' }, locked ? null : addItemPanel(current), meetingsPanel()))];
+    } else {
+      body = h('div', { class: 'panel empty' },
+        h('h3', null, 'No meetings yet'),
+        h('p', { class: 'muted' }, canWrite ? 'Create the first meeting, then add agenda items with a presenter and time for each.' : 'Meetings appear here once the team creates them.'),
+        canWrite ? h('div', null, h('button', { class: 'btn primary', onclick: () => select('new') }, 'New meeting')) : null);
+    }
+    return [head, state.error ? h('p', { class: 'error', role: 'alert' }, state.error) : null, body];
   }
 
   function select(id) {
     state.selected = id;
     state.error = null;
-    state.notice = null;
     state.armed = null;
     render();
     window.scrollTo({ top: 0 });
   }
 
+  // ---------- shell ----------
+  function route() {
+    const id = location.hash.slice(1);
+    return SECTIONS.some((s) => s.id === id) ? id : SECTIONS[0].id;
+  }
+
+  function renderNav() {
+    const current = route();
+    const nav = document.getElementById('nav');
+    nav.replaceChildren(
+      ...SECTIONS.map((s) => {
+        const a = h('a', { href: `#${s.id}`, class: s.id === current ? 'active' : '' }, h('span', null, s.label));
+        a.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${s.icon}"/></svg>`);
+        return a;
+      }),
+      h('div', { class: 'soon' }, 'More sections to follow'));
+  }
+
   function build() {
     if (state.unavailable) {
-      return h('div', { class: 'main empty' },
-        h('h2', null, 'Sign in to see the team agenda'),
-        h('p', { class: 'muted' }, 'The agenda is shared between BK117 check pilots and loads only for signed-in viewers of this page on claude.ai.'));
+      return [h('div', { class: 'page-head' }, h('div', null, h('h2', null, 'Meetings'))),
+        h('div', { class: 'panel empty' },
+          h('h3', null, 'Sign in to see the team agenda'),
+          h('p', { class: 'muted' }, 'Meetings are shared between the BK117 check pilots and load only for signed-in viewers of this page on claude.ai.'))];
     }
-    if (!Object.values(state.loaded).every(Boolean)) return h('p', { class: 'main muted' }, 'Loading meetings…');
-
-    const { up, past } = sortedMeetings();
-    if (state.selected !== 'new' && !state.meetings.some((m) => m.id === state.selected)) state.selected = (up[0] ?? past[0])?.id ?? null;
-    const current = state.meetings.find((m) => m.id === state.selected);
-
-    return h('div', { class: 'layout' },
-      meetingList(),
-      h('main', { class: 'main' },
-        state.selected === 'new' ? newMeetingForm()
-          : current ? agenda(current)
-          : h('div', { class: 'empty' },
-              h('h2', null, 'No meetings yet'),
-              h('p', { class: 'muted' }, 'Tap New meeting to set the date, then add agenda items with a presenter and time for each.'))));
+    if (!Object.values(state.loaded).every(Boolean)) return [h('p', { class: 'muted' }, 'Loading meetings…')];
+    return meetingsView();
   }
 
   // Re-rendering keeps typed-but-unsaved text: drafts and whatever field has focus.
   function render() {
+    renderNav();
     const active = document.activeElement;
-    const focusId = active && root.contains(active) ? active.id : '';
+    const focusId = active && view.contains(active) ? active.id : '';
     const focusValue = focusId && active.tagName === 'TEXTAREA' ? active.value : null;
     let selection = null;
     try { if (focusId) selection = [active.selectionStart, active.selectionEnd]; } catch { /* number inputs */ }
     const drafts = {};
-    root.querySelectorAll('[id^="draft-"]').forEach((e) => { drafts[e.id] = e.value; });
+    view.querySelectorAll('[id^="draft-"]').forEach((e) => { drafts[e.id] = e.value; });
 
-    root.replaceChildren(build());
+    view.replaceChildren(...build().flat().filter(Boolean));
 
     for (const [id, value] of Object.entries(drafts)) { const e = document.getElementById(id); if (e) e.value = value; }
     const e = focusId && document.getElementById(focusId);
@@ -405,6 +530,8 @@ textarea { min-height: 72px; resize: vertical; }
 
   // ---------- start ----------
   async function start() {
+    window.addEventListener('hashchange', render);
+    renderNav();
     const db = window.claude?.use ? await window.claude.use('db') : null;
     if (!db) { state.unavailable = true; render(); return; }
     state.db = db;
