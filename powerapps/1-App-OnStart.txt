@@ -3,4 +3,4 @@ If(
     Set(varMeeting, First(Sort(Meetings, MeetingDate, SortOrder.Descending))),
     Set(varMeeting, First(Sort(Filter(Meetings, Status = "Upcoming"), MeetingDate, SortOrder.Ascending)))
 );
-Set(varArmed, "")
+Set(varArmed, Blank())
