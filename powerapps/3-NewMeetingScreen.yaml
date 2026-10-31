@@ -78,7 +78,7 @@
 - lblNewTitle:
     Control: Label
     Properties:
-      Text: ="New meeting"
+      Text: =If(varEditMeeting, "Edit meeting", "New meeting")
       X: =288
       Y: =40
       Width: =500
@@ -100,7 +100,7 @@
 - txtMTitle:
     Control: Classic/TextInput
     Properties:
-      Default: ="BK117 check pilot meeting"
+      Default: =If(varEditMeeting, varMeeting.Title, "BK117 check pilot meeting")
       X: =288
       Y: =116
       Width: =512
@@ -121,7 +121,7 @@
 - dpMDate:
     Control: Classic/DatePicker
     Properties:
-      DefaultDate: =Today()
+      DefaultDate: =If(varEditMeeting, varMeeting.MeetingDate, Today())
       X: =288
       Y: =196
       Width: =260
@@ -142,7 +142,7 @@
 - txtMStart:
     Control: Classic/TextInput
     Properties:
-      Default: ="09:00"
+      Default: =If(varEditMeeting, varMeeting.StartTime, "09:00")
       HintText: ="09:00"
       X: =568
       Y: =196
@@ -164,7 +164,7 @@
 - txtMLocation:
     Control: Classic/TextInput
     Properties:
-      Default: =""
+      Default: =If(varEditMeeting, varMeeting.Location, "")
       X: =288
       Y: =276
       Width: =512
@@ -174,7 +174,7 @@
 - btnCreate:
     Control: Classic/Button
     Properties:
-      Text: ="Create meeting"
+      Text: =If(varEditMeeting, "Save changes", "Create meeting")
       X: =288
       Y: =352
       Width: =200
@@ -194,15 +194,14 @@
         =If(
             IsBlank(txtMTitle.Text) || !IsMatch(txtMStart.Text, "\d{2}:\d{2}"),
             Notify("Enter a title and a start time like 09:00.", NotificationType.Warning),
-            Set(varMeeting, Patch(Meetings, Defaults(Meetings), {
+            Set(varMeeting, Patch(Meetings, If(varEditMeeting, varMeeting, Defaults(Meetings)), {
                 Title: txtMTitle.Text,
                 MeetingDate: dpMDate.SelectedDate,
                 StartTime: txtMStart.Text,
                 Location: txtMLocation.Text,
-                Status: "Upcoming"
+                Status: If(varEditMeeting, varMeeting.Status, "Upcoming")
             }));
-            Set(varArmed, "");
-            Reset(txtMLocation);
+            Set(varArmed, Blank());
             Navigate(MeetingsScreen)
         )
 - btnCancel:

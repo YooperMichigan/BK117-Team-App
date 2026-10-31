@@ -126,7 +126,7 @@
         )
       X: =290
       Y: =58
-      Width: =640
+      Width: =520
       Height: =36
       Size: =18
       FontWeight: =FontWeight.Bold
@@ -141,7 +141,7 @@
         " · " & CountRows(Filter(AgendaItems, MeetingID = varMeeting.ID)) & " items"
       X: =290
       Y: =98
-      Width: =640
+      Width: =520
       Height: =28
       Size: =11
       Color: =RGBA(195, 203, 212, 1)
@@ -209,6 +209,24 @@
                 )
             )
         )
+- btnEditMeeting:
+    Control: Classic/Button
+    Properties:
+      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Text: ="Edit meeting"
+      X: =820
+      Y: =62
+      Width: =120
+      Height: =44
+      Size: =12
+      FontWeight: =FontWeight.Bold
+      Fill: =RGBA(22, 32, 44, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      OnSelect: =Set(varEditMeeting, true); Navigate(NewMeetingScreen)
 - btnHeld:
     Control: Classic/Button
     Properties:
@@ -577,7 +595,7 @@
       RadiusTopRight: =10
       RadiusBottomLeft: =10
       RadiusBottomRight: =10
-      OnSelect: =Navigate(NewMeetingScreen)
+      OnSelect: =Set(varEditMeeting, false); Navigate(NewMeetingScreen)
 - galMeetings:
     Control: Gallery
     Variant: Vertical
@@ -596,6 +614,7 @@
       - lblMDate:
           Control: Label
           Properties:
+            OnSelect: =Select(Parent)
             Text: =Text(ThisItem.MeetingDate, "ddd, mmm d, yyyy")
             X: =14
             Y: =6
@@ -607,6 +626,7 @@
       - lblMInfo:
           Control: Label
           Properties:
+            OnSelect: =Select(Parent)
             Text: =ThisItem.StartTime & " · " & ThisItem.Status
             X: =14
             Y: =30
