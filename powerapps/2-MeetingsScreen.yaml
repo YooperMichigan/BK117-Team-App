@@ -655,10 +655,42 @@
             RadiusBottomLeft: =8
             RadiusBottomRight: =8
             OnSelect: =Set(varArmed, Blank())
+# ---------- Empty-state pictures (upload backgrounds/*.png under Media first) ----------
+# Pictures sit above the panels; hint labels and add-item fields must be brought in front of them.
+- imgAgendaEmpty:
+    Control: Image
+    Properties:
+      Image: ='agenda-empty'
+      ImagePosition: =ImagePosition.Fit
+      Visible: =IsEmpty(Filter(AgendaItems, MeetingID = varMeeting.ID))
+      X: =265
+      Y: =169
+      Width: =700
+      Height: =574
+- imgAddEmpty:
+    Control: Image
+    Properties:
+      Image: ='add-item-empty'
+      ImagePosition: =ImagePosition.Fit
+      Visible: =IsBlank(varMeeting)
+      X: =990
+      Y: =168
+      Width: =344
+      Height: =262
+- imgMeetingsEmpty:
+    Control: Image
+    Properties:
+      Image: ='meetings-list-empty'
+      ImagePosition: =ImagePosition.Fit
+      Visible: =IsBlank(varMeeting)
+      X: =990
+      Y: =492
+      Width: =344
+      Height: =252
 - lblNoMeetingsList:
     Control: Label
     Properties:
-      Visible: =CountRows(galMeetings.AllItems) = 0
+      Visible: =IsBlank(varMeeting)
       Text: ="Meetings you create appear here, newest first."
       X: =1004
       Y: =508
