@@ -142,8 +142,8 @@
 - txtMStart:
     Control: Classic/TextInput
     Properties:
-      Default: =If(varEditMeeting, varMeeting.StartTime, "09:00")
-      HintText: ="09:00"
+      Default: =If(varEditMeeting, varMeeting.StartTime, "11:00")
+      HintText: ="11:00"
       X: =528
       Y: =196
       Width: =130
@@ -164,8 +164,16 @@
 - txtMEnd:
     Control: Classic/TextInput
     Properties:
-      Default: =If(varEditMeeting, varMeeting.EndTime, "10:00")
-      HintText: ="10:00"
+      Default: |-
+        =If(
+            varEditMeeting,
+            varMeeting.EndTime,
+            With(
+                {t: Value(Left(txtMStart.Text, 2)) * 60 + Value(Right(txtMStart.Text, 2)) + 60},
+                Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
+            )
+        )
+      HintText: ="12:00"
       X: =670
       Y: =196
       Width: =130
