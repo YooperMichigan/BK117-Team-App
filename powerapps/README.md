@@ -10,6 +10,7 @@ Air Methods' own Microsoft 365 without an IT ticket. Data lives in three SharePo
 | `3-NewMeetingScreen.yaml` | The New / Edit meeting form | Paste into `NewMeetingScreen` |
 | `4-NewMeetingScreen-OnVisible.txt` | Clears the form each time it opens | NewMeetingScreen → OnVisible |
 | `5-HomeScreen.yaml` | Home screen: sidebar plus the helicopter drawing; the app opens here | Paste into `HomeScreen` |
+| `6-MeetingList-Actions.yaml` | Meeting list with an Actions drop-down: Mark complete, Reopen, Delete meeting | Replaces lblMeetings + galMeetings on `MeetingsScreen` |
 
 Step-by-step instructions, including the SharePoint list columns, are in the build guide doc.
 

@@ -1,0 +1,170 @@
+# BK117 Check Pilots: meeting list with an Actions drop-down per meeting.
+# First delete lblMeetings and galMeetings (and btnCarry, btnHeld) from MeetingsScreen,
+# then right-click MeetingsScreen, Paste code.
+- lblMeetings:
+    Control: Label
+    Properties:
+      Text: ="All meetings"
+      X: =990
+      Y: =448
+      Width: =190
+      Height: =32
+      Size: =13
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(22, 32, 44, 1)
+- galMeetings:
+    Control: Gallery
+    Variant: Vertical
+    Properties:
+      Items: =Sort(Meetings, MeetingDate, SortOrder.Descending)
+      X: =990
+      Y: =492
+      Width: =344
+      Height: =252
+      TemplateSize: =60
+      TemplatePadding: =0
+      Fill: =Color.White
+      TemplateFill: =If(ThisItem.ID = varMeeting.ID, RGBA(251, 227, 212, 1), Color.Transparent)
+      OnSelect: =Set(varMeeting, ThisItem); Set(varArmed, Blank())
+    Children:
+      - lblMDate:
+          Control: Label
+          Properties:
+            OnSelect: =Select(Parent)
+            Text: =Text(ThisItem.MeetingDate, "ddd, mmm d, yyyy")
+            X: =14
+            Y: =6
+            Width: =180
+            Height: =26
+            Size: =12
+            FontWeight: =FontWeight.Semibold
+            Color: =RGBA(22, 32, 44, 1)
+      - lblMInfo:
+          Control: Label
+          Properties:
+            OnSelect: =Select(Parent)
+            Text: =ThisItem.StartTime & " · " & If(ThisItem.Status = "Held", "Completed", ThisItem.Status)
+            X: =14
+            Y: =30
+            Width: =180
+            Height: =24
+            Size: =10
+            Color: =RGBA(91, 100, 112, 1)
+      - ddMAction:
+          Control: Classic/DropDown
+          Properties:
+            Visible: =!(varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID)
+            Items: |-
+              =If(ThisItem.Status = "Held", ["Actions", "Reopen", "Delete meeting"], ["Actions", "Mark complete", "Delete meeting"])
+            Default: ="Actions"
+            X: =200
+            Y: =10
+            Width: =134
+            Height: =40
+            Size: =10
+            BorderColor: =RGBA(226, 224, 219, 1)
+            OnChange: |-
+              =Switch(
+                  Self.Selected.Value,
+                  "Mark complete", Set(varArmed, "mdone" & ThisItem.ID),
+                  "Delete meeting", Set(varArmed, "mdel" & ThisItem.ID),
+                  "Reopen",
+                      Patch(Meetings, ThisItem, {Status: "Upcoming"});
+                      If(ThisItem.ID = varMeeting.ID, Set(varMeeting, LookUp(Meetings, ID = ThisItem.ID)));
+                      Notify("Meeting reopened", NotificationType.Success)
+              );
+              Reset(Self)
+      - btnMConfirm:
+          Control: Classic/Button
+          Properties:
+            Visible: =varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID
+            Text: =If(varArmed = "mdel" & ThisItem.ID, "Confirm delete", "Confirm")
+            X: =196
+            Y: =10
+            Width: =104
+            Height: =40
+            Size: =10
+            FontWeight: =FontWeight.Bold
+            Fill: =If(varArmed = "mdel" & ThisItem.ID, RGBA(179, 38, 30, 1), RGBA(232, 105, 31, 1))
+            HoverFill: =If(varArmed = "mdel" & ThisItem.ID, RGBA(150, 30, 25, 1), RGBA(210, 90, 20, 1))
+            Color: =Color.White
+            HoverColor: =Color.White
+            BorderThickness: =0
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            OnSelect: |-
+              =If(
+                  varArmed = "mdel" & ThisItem.ID,
+                  With({m: ThisItem},
+                      RemoveIf(AgendaItems, MeetingID = m.ID);
+                      Remove(Meetings, m);
+                      If(m.ID = varMeeting.ID,
+                          If(IsBlank(First(Filter(Meetings, Status = "Upcoming"))),
+                              Set(varMeeting, First(Sort(Meetings, MeetingDate, SortOrder.Descending))),
+                              Set(varMeeting, First(Sort(Filter(Meetings, Status = "Upcoming"), MeetingDate, SortOrder.Ascending)))
+                          )
+                      );
+                      Notify("Meeting deleted", NotificationType.Success)
+                  ),
+                  With(
+                      {
+                          m: ThisItem,
+                          nextMeeting: First(Sort(
+                              Filter(Meetings, Status = "Upcoming" && MeetingDate > ThisItem.MeetingDate),
+                              MeetingDate, SortOrder.Ascending))
+                      },
+                      With(
+                          {
+                              openItems: Sort(Filter(AgendaItems, MeetingID = m.ID && Status = "Open"), Position, SortOrder.Ascending),
+                              base: CountRows(Filter(AgendaItems, MeetingID = nextMeeting.ID))
+                          },
+                          If(!IsBlank(nextMeeting) && CountRows(openItems) > 0,
+                              ForAll(Sequence(CountRows(openItems)) As n,
+                                  With({item: Index(openItems, n.Value)},
+                                      Patch(AgendaItems, Defaults(AgendaItems), {
+                                          Title: item.Title,
+                                          MeetingID: nextMeeting.ID,
+                                          Position: base + n.Value,
+                                          Presenter: item.Presenter,
+                                          Minutes: item.Minutes,
+                                          Status: "Open",
+                                          CarriedFrom: m.MeetingDate
+                                      })
+                                  )
+                              );
+                              ForAll(openItems As o, Patch(AgendaItems, o, {Status: "Carried"}))
+                          );
+                          Patch(Meetings, m, {Status: "Held"});
+                          If(m.ID = varMeeting.ID, Set(varMeeting, LookUp(Meetings, ID = m.ID)));
+                          Notify(
+                              If(IsBlank(nextMeeting) || CountRows(openItems) = 0,
+                                  "Meeting marked complete",
+                                  "Meeting marked complete. " & CountRows(openItems) & " open items moved to " & Text(nextMeeting.MeetingDate, "mmm d")),
+                              NotificationType.Success)
+                      )
+                  )
+              );
+              Set(varArmed, Blank())
+      - btnMCancel:
+          Control: Classic/Button
+          Properties:
+            Visible: =varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID
+            Text: ="✕"
+            X: =304
+            Y: =10
+            Width: =32
+            Height: =40
+            Size: =11
+            Fill: =Color.White
+            HoverFill: =RGBA(243, 242, 239, 1)
+            Color: =RGBA(22, 32, 44, 1)
+            HoverColor: =RGBA(22, 32, 44, 1)
+            BorderColor: =RGBA(22, 32, 44, 1)
+            BorderThickness: =1
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            OnSelect: =Set(varArmed, Blank())
