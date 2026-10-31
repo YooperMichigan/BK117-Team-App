@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#16202C"/>
+  <rect x="96" y="96" width="320" height="10" rx="5" fill="#E8691F"/>
+  <circle cx="256" cy="101" r="14" fill="#E8691F"/>
+  <text x="256" y="300" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="800" font-size="128" fill="#FFFFFF">BK117</text>
+  <rect x="166" y="346" width="180" height="6" rx="3" fill="#2A3542"/>
+  <text x="256" y="420" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="40" fill="#F0A070" letter-spacing="14">TEAM</text>
+</svg>
