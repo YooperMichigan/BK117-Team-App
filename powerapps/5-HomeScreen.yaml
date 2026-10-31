@@ -1,0 +1,104 @@
+# BK117 Check Pilots: Home screen.
+# Paste into HomeScreen: right-click the screen in the Tree view, Paste code.
+# Afterwards set imgHome's Image property to the name of the uploaded helicopter drawing.
+- rectBackground3:
+    Control: Rectangle
+    Properties:
+      Fill: =Color.White
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+- imgHome:
+    Control: Image
+    Properties:
+      ImagePosition: =ImagePosition.Fit
+      X: =264
+      Y: =32
+      Width: =Parent.Width - 296
+      Height: =Parent.Height - 64
+- rectSidebar3:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(22, 32, 44, 1)
+      X: =0
+      Y: =0
+      Width: =232
+      Height: =Parent.Height
+- lblKickerBrand3:
+    Control: Label
+    Properties:
+      Text: ="TRAINING DEPARTMENT"
+      X: =24
+      Y: =24
+      Width: =200
+      Height: =20
+      Size: =9
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(195, 203, 212, 1)
+- lblBrand3:
+    Control: Label
+    Properties:
+      Text: ="BK117 Check Pilots"
+      X: =24
+      Y: =44
+      Width: =200
+      Height: =60
+      Size: =18
+      FontWeight: =FontWeight.Bold
+      Color: =Color.White
+- btnNavHome3:
+    Control: Classic/Button
+    Properties:
+      Text: ="Home"
+      X: =16
+      Y: =116
+      Width: =200
+      Height: =46
+      Size: =13
+      FontWeight: =FontWeight.Semibold
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(42, 53, 66, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+- btnNavMeetings3:
+    Control: Classic/Button
+    Properties:
+      Text: ="Meetings"
+      X: =16
+      Y: =166
+      Width: =200
+      Height: =46
+      Size: =13
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(22, 32, 44, 1)
+      HoverFill: =RGBA(42, 53, 66, 1)
+      PressedFill: =RGBA(42, 53, 66, 1)
+      Color: =RGBA(195, 203, 212, 1)
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+      OnSelect: =Navigate(MeetingsScreen)
+- lblSoon3:
+    Control: Label
+    Properties:
+      Text: ="More sections to follow"
+      X: =28
+      Y: =218
+      Width: =190
+      Height: =24
+      Size: =10
+      Color: =RGBA(195, 203, 212, 1)
