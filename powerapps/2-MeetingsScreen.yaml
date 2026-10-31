@@ -75,23 +75,11 @@
       Color: =RGBA(195, 203, 212, 1)
 
 # ---------- Empty state ----------
-- lblEmpty:
-    Control: Label
-    Properties:
-      Visible: =IsBlank(varMeeting)
-      Text: ="No meetings yet. Tap + New meeting to create the first one."
-      X: =264
-      Y: =40
-      Width: =700
-      Height: =40
-      Size: =14
-      Color: =RGBA(91, 100, 112, 1)
-
 # ---------- Meeting card ----------
 - rectHero:
     Control: Rectangle
     Properties:
-      Visible: =!IsBlank(varMeeting)
+      Visible: =true
       Fill: =RGBA(22, 32, 44, 1)
       X: =264
       Y: =24
@@ -100,7 +88,7 @@
 - lblHeroKicker:
     Control: Label
     Properties:
-      Visible: =!IsBlank(varMeeting)
+      Visible: =true
       Text: =If(varMeeting.Status = "Held", "COMPLETED MEETING", "UPCOMING MEETING")
       X: =290
       Y: =36
@@ -112,11 +100,11 @@
 - lblHeroTitle:
     Control: Label
     Properties:
-      Visible: =!IsBlank(varMeeting)
+      Visible: =true
       Text: |-
         =If(
             IsBlank(varMeeting),
-            "",
+            "No meetings scheduled",
             With(
                 {t: Value(Left(varMeeting.StartTime, 2)) * 60 + Value(Right(varMeeting.StartTime, 2))
                     + Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes)},
@@ -167,7 +155,7 @@
 - rectAgendaPanel:
     Control: Rectangle
     Properties:
-      Visible: =!IsBlank(varMeeting)
+      Visible: =true
       Fill: =Color.White
       BorderColor: =RGBA(226, 224, 219, 1)
       BorderThickness: =1
@@ -378,7 +366,7 @@
 - rectAdd:
     Control: Rectangle
     Properties:
-      Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
+      Visible: =varMeeting.Status <> "Held"
       Fill: =Color.White
       BorderColor: =RGBA(226, 224, 219, 1)
       BorderThickness: =1
@@ -662,3 +650,14 @@
             RadiusBottomLeft: =8
             RadiusBottomRight: =8
             OnSelect: =Set(varArmed, Blank())
+- lblNoMeetingsList:
+    Control: Label
+    Properties:
+      Visible: =CountRows(galMeetings.AllItems) = 0
+      Text: ="Meetings you create appear here, newest first."
+      X: =1004
+      Y: =508
+      Width: =316
+      Height: =48
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
