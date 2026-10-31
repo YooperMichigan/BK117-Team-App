@@ -15,10 +15,12 @@ The YAML uses Power Apps' paste-code format (classic controls). It was written w
 to Power Apps, so a control type or property name may need a small fix the first time; the
 paste error names the line.
 
-## Status: paused (Oct 30, 2026)
+## Status: working (Oct 31, 2026)
 
-Trialled in the Air Methods tenant. The screens pasted and the layout rendered after removing
-the default ScreenContainer1, but the presenter drop-down stayed empty and Add item failed.
-Fixing it meant relaying every error between two computers, so the route was paused in favour of
-building where Claude can run and test the code (the claude.ai version in `hosted/`). For Teams,
-the preferred next step is asking IT about Power Apps code apps or a custom Teams app.
+Running in the Air Methods tenant and added to Teams. Fixes found during the trial, now in these files:
+- Delete the default ScreenContainer1 a new screen comes with; it is white and hides the pasted controls.
+- Times are computed from the HH:MM start time in minutes (string date parsing failed with no meeting).
+- OnStart uses `Blank()`; Mac smart quotes turned `""` into curly quotes.
+- Presenter drop-down: `ShowColumns(Sort(CheckPilots, ListOrder, SortOrder.Ascending), Title)`.
+  If the SharePoint list was named with a space, refer to it as `'Check Pilots'`.
+- Add item wraps the Patch in `IfError` so any save error is shown on screen.

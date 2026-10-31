@@ -490,8 +490,7 @@
     Control: Classic/DropDown
     Properties:
       Visible: =!IsBlank(varMeeting) && varMeeting.Status <> "Held"
-      Items: =Sort(CheckPilots, ListOrder, SortOrder.Ascending)
-      Value: =Title
+      Items: =ShowColumns(Sort(CheckPilots, ListOrder, SortOrder.Ascending), Title)
       AllowEmptySelection: =true
       Default: =""
       X: =1010
@@ -533,20 +532,17 @@
       RadiusBottomLeft: =10
       RadiusBottomRight: =10
       OnSelect: |-
-        =If(
-            IsBlank(txtTopic.Text) || IsBlank(Value(txtMinutes.Text)),
-            Notify("Enter a topic and the minutes.", NotificationType.Warning),
-            With({lastPos: Max(Filter(AgendaItems, MeetingID = varMeeting.ID), Position)},
-                Patch(AgendaItems, Defaults(AgendaItems), {
-                    Title: txtTopic.Text,
-                    MeetingID: varMeeting.ID,
-                    Position: If(IsBlank(lastPos), 0, lastPos) + 1,
-                    Presenter: ddPresenter.Selected.Title,
-                    Minutes: Value(txtMinutes.Text),
-                    Status: "Open"
-                })
-            );
-            Reset(txtTopic)
+        =IfError(
+            Patch(AgendaItems, Defaults(AgendaItems), {
+                Title: txtTopic.Text,
+                MeetingID: varMeeting.ID,
+                Position: CountRows(Filter(AgendaItems, MeetingID = varMeeting.ID)) + 1,
+                Presenter: ddPresenter.Selected.Title,
+                Minutes: Value(txtMinutes.Text),
+                Status: "Open"
+            });
+            Reset(txtTopic),
+            Notify(FirstError.Message, NotificationType.Error)
         )
 
 # ---------- Meeting list ----------
