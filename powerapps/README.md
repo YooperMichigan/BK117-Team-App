@@ -27,3 +27,5 @@ Running in the Air Methods tenant and added to Teams. Fixes found during the tri
 - Presenter drop-down: `ShowColumns(Sort(CheckPilots, ListOrder, SortOrder.Ascending), Title)`.
   If the SharePoint list was named with a space, refer to it as `'Check Pilots'`.
 - Add item wraps the Patch in `IfError` so any save error is shown on screen.
+
+The Meetings list also needs an `EndTime` column (Single line of text, HH:MM), added Oct 31, 2026.

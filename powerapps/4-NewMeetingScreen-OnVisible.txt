@@ -1,1 +1,1 @@
-Reset(txtMTitle); Reset(dpMDate); Reset(txtMStart); Reset(txtMLocation)
+Reset(txtMTitle); Reset(dpMDate); Reset(txtMStart); Reset(txtMEnd); Reset(txtMLocation)

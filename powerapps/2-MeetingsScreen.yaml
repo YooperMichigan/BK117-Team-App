@@ -105,11 +105,15 @@
         =If(
             IsBlank(varMeeting),
             "No meetings scheduled",
-            With(
-                {t: Value(Left(varMeeting.StartTime, 2)) * 60 + Value(Right(varMeeting.StartTime, 2))
-                    + Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes)},
-                Text(varMeeting.MeetingDate, "dddd, mmmm d") & " · " & varMeeting.StartTime & "–" &
-                Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
+            Text(varMeeting.MeetingDate, "dddd, mmmm d") & " · " & varMeeting.StartTime & "–" &
+            If(
+                IsBlank(varMeeting.EndTime),
+                With(
+                    {t: Value(Left(varMeeting.StartTime, 2)) * 60 + Value(Right(varMeeting.StartTime, 2))
+                        + Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes)},
+                    Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
+                ),
+                varMeeting.EndTime
             )
         )
       X: =290
@@ -126,7 +130,8 @@
       Text: |-
         =varMeeting.Title &
         If(!IsBlank(varMeeting.Location), " · " & varMeeting.Location) &
-        " · " & CountRows(Filter(AgendaItems, MeetingID = varMeeting.ID)) & " items"
+        " · " & CountRows(Filter(AgendaItems, MeetingID = varMeeting.ID)) & " items, " &
+        Coalesce(Sum(Filter(AgendaItems, MeetingID = varMeeting.ID), Minutes), 0) & " min planned"
       X: =290
       Y: =98
       Width: =520
@@ -521,7 +526,7 @@
           Control: Label
           Properties:
             OnSelect: =Select(Parent)
-            Text: =ThisItem.StartTime & " · " & If(ThisItem.Status = "Held", "Completed", ThisItem.Status)
+            Text: =ThisItem.StartTime & If(!IsBlank(ThisItem.EndTime), "–" & ThisItem.EndTime) & " · " & If(ThisItem.Status = "Held", "Completed", ThisItem.Status)
             X: =14
             Y: =30
             Width: =180
@@ -657,6 +662,28 @@
       Text: ="Meetings you create appear here, newest first."
       X: =1004
       Y: =508
+      Width: =316
+      Height: =48
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
+- lblAgendaHint:
+    Control: Label
+    Properties:
+      Visible: =CountRows(galAgenda.AllItems) = 0
+      Text: =If(IsBlank(varMeeting), "Once a meeting is created, its agenda items will appear here.", "No agenda items yet. Add the first one under Add agenda item.")
+      X: =288
+      Y: =190
+      Width: =650
+      Height: =48
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
+- lblAddHint:
+    Control: Label
+    Properties:
+      Visible: =IsBlank(varMeeting)
+      Text: ="Once a meeting is created, you can add agenda items here."
+      X: =1004
+      Y: =184
       Width: =316
       Height: =48
       Size: =11

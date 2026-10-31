@@ -124,17 +124,17 @@
       DefaultDate: =If(varEditMeeting, varMeeting.MeetingDate, Today())
       X: =288
       Y: =196
-      Width: =260
+      Width: =220
       Height: =44
       Size: =12
       BorderColor: =RGBA(226, 224, 219, 1)
 - lblMStartLabel:
     Control: Label
     Properties:
-      Text: ="Start time (HH:MM)"
-      X: =568
+      Text: ="Start (HH:MM)"
+      X: =528
       Y: =172
-      Width: =232
+      Width: =130
       Height: =22
       Size: =10
       FontWeight: =FontWeight.Semibold
@@ -144,9 +144,31 @@
     Properties:
       Default: =If(varEditMeeting, varMeeting.StartTime, "09:00")
       HintText: ="09:00"
-      X: =568
+      X: =528
       Y: =196
-      Width: =140
+      Width: =130
+      Height: =44
+      Size: =12
+      BorderColor: =RGBA(226, 224, 219, 1)
+- lblMEndLabel:
+    Control: Label
+    Properties:
+      Text: ="End (HH:MM)"
+      X: =670
+      Y: =172
+      Width: =130
+      Height: =22
+      Size: =10
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(91, 100, 112, 1)
+- txtMEnd:
+    Control: Classic/TextInput
+    Properties:
+      Default: =If(varEditMeeting, varMeeting.EndTime, "10:00")
+      HintText: ="10:00"
+      X: =670
+      Y: =196
+      Width: =130
       Height: =44
       Size: =12
       BorderColor: =RGBA(226, 224, 219, 1)
@@ -192,12 +214,15 @@
       RadiusBottomRight: =10
       OnSelect: |-
         =If(
-            IsBlank(txtMTitle.Text) || !IsMatch(txtMStart.Text, "\d{2}:\d{2}"),
-            Notify("Enter a title and a start time like 09:00.", NotificationType.Warning),
+            IsBlank(txtMTitle.Text) || !IsMatch(txtMStart.Text, "\d{2}:\d{2}") || !IsMatch(txtMEnd.Text, "\d{2}:\d{2}"),
+            Notify("Enter a title, and start and end times like 09:00.", NotificationType.Warning),
+            Value(Left(txtMEnd.Text, 2)) * 60 + Value(Right(txtMEnd.Text, 2)) <= Value(Left(txtMStart.Text, 2)) * 60 + Value(Right(txtMStart.Text, 2)),
+            Notify("The end time must be after the start time.", NotificationType.Warning),
             Set(varMeeting, Patch(Meetings, If(varEditMeeting, varMeeting, Defaults(Meetings)), {
                 Title: txtMTitle.Text,
                 MeetingDate: dpMDate.SelectedDate,
                 StartTime: txtMStart.Text,
+                EndTime: txtMEnd.Text,
                 Location: txtMLocation.Text,
                 Status: If(varEditMeeting, varMeeting.Status, "Upcoming")
             }));
