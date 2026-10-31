@@ -55,7 +55,7 @@
           Properties:
             Visible: =!(varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID)
             Items: |-
-              =If(ThisItem.Status = "Held", ["Actions", "Reopen", "Delete meeting"], ["Actions", "Mark complete", "Delete meeting"])
+              =If(ThisItem.Status = "Held", ["Actions", "Reopen", "Delete meeting"], ["Actions", "Edit meeting", "Mark complete", "Delete meeting"])
             Default: ="Actions"
             X: =200
             Y: =10
@@ -66,6 +66,10 @@
             OnChange: |-
               =Switch(
                   Self.Selected.Value,
+                  "Edit meeting",
+                      Set(varMeeting, ThisItem);
+                      Set(varEditMeeting, true);
+                      Navigate(NewMeetingScreen),
                   "Mark complete", Set(varArmed, "mdone" & ThisItem.ID),
                   "Delete meeting", Set(varArmed, "mdel" & ThisItem.ID),
                   "Reopen",
