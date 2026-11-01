@@ -12,6 +12,7 @@ Air Methods' own Microsoft 365 without an IT ticket. Data lives in three SharePo
 | `5-HomeScreen.yaml` | Home screen: sidebar plus the helicopter drawing; the app opens here | Paste into `HomeScreen` |
 | `6-MeetingList-Actions.yaml` | Meeting list with an Actions drop-down: Mark complete, Reopen, Delete meeting | Replaces lblMeetings + galMeetings on `MeetingsScreen` |
 | `8-IntendScreen.yaml` | "I intend to..." page shell | Paste into a blank `IntendScreen` |
+| `9-IntendContent.yaml` | "I intend to..." header, list and add box (needs the Intentions list) | Paste into `IntendScreen` |
 
 Step-by-step instructions, including the SharePoint list columns, are in the build guide doc.
 
