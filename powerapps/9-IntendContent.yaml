@@ -159,7 +159,7 @@
 - lblIntendHint:
     Control: Label
     Properties:
-      Visible: =IsEmpty(Intentions)
+      Visible: =CountRows(galIntend.AllItems) = 0
       Text: ="Intentions you add appear here, newest first."
       X: =288
       Y: =190
