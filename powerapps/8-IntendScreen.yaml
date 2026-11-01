@@ -1,0 +1,137 @@
+# BK117 Check Pilots: "I intend to..." screen (shell; content to follow).
+# Create a blank screen named IntendScreen (delete any ScreenContainer1), then right-click it, Paste code.
+- rectBackground4:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(243, 242, 239, 1)
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+- rectSidebar4:
+    Control: Rectangle
+    Properties:
+      Fill: =RGBA(14, 34, 64, 1)
+      X: =0
+      Y: =0
+      Width: =232
+      Height: =Parent.Height
+- lblKickerBrand4:
+    Control: Label
+    Properties:
+      Text: ="TRAINING DEPARTMENT"
+      X: =24
+      Y: =24
+      Width: =200
+      Height: =20
+      Size: =9
+      FontWeight: =FontWeight.Semibold
+      Color: =RGBA(195, 203, 212, 1)
+- lblBrand4:
+    Control: Label
+    Properties:
+      Text: ="BK117 Check Pilots"
+      X: =24
+      Y: =44
+      Width: =200
+      Height: =60
+      Size: =18
+      FontWeight: =FontWeight.Bold
+      Color: =Color.White
+- btnNavHome4:
+    Control: Classic/Button
+    Properties:
+      Text: ="Home"
+      X: =16
+      Y: =116
+      Width: =200
+      Height: =46
+      Size: =13
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(14, 34, 64, 1)
+      HoverFill: =RGBA(31, 58, 99, 1)
+      PressedFill: =RGBA(31, 58, 99, 1)
+      Color: =RGBA(195, 203, 212, 1)
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+      OnSelect: =Navigate(HomeScreen)
+- btnNavMeetings4:
+    Control: Classic/Button
+    Properties:
+      Text: ="Meetings"
+      X: =16
+      Y: =166
+      Width: =200
+      Height: =46
+      Size: =13
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(14, 34, 64, 1)
+      HoverFill: =RGBA(31, 58, 99, 1)
+      PressedFill: =RGBA(31, 58, 99, 1)
+      Color: =RGBA(195, 203, 212, 1)
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+      OnSelect: =Navigate(MeetingsScreen)
+- btnNavIntend4:
+    Control: Classic/Button
+    Properties:
+      Text: ="I intend to..."
+      X: =16
+      Y: =216
+      Width: =200
+      Height: =46
+      Size: =13
+      FontWeight: =FontWeight.Semibold
+      Align: =Align.Left
+      PaddingLeft: =14
+      Fill: =RGBA(31, 58, 99, 1)
+      HoverFill: =RGBA(31, 58, 99, 1)
+      PressedFill: =RGBA(31, 58, 99, 1)
+      Color: =Color.White
+      HoverColor: =Color.White
+      BorderThickness: =0
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+- lblIntendTitle:
+    Control: Label
+    Properties:
+      Text: ="I intend to..."
+      X: =264
+      Y: =28
+      Width: =700
+      Height: =44
+      Size: =22
+      FontWeight: =FontWeight.Bold
+      Color: =RGBA(22, 32, 44, 1)
+- rectIntendPanel:
+    Control: Rectangle
+    Properties:
+      Fill: =Color.White
+      BorderColor: =RGBA(226, 224, 219, 1)
+      BorderThickness: =1
+      X: =264
+      Y: =92
+      Width: =1070
+      Height: =652
+- lblIntendPlaceholder:
+    Control: Label
+    Properties:
+      Text: ="Content for this page is coming soon."
+      X: =288
+      Y: =112
+      Width: =700
+      Height: =40
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
