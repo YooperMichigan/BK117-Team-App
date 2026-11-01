@@ -215,6 +215,8 @@
     Control: Classic/DropDown
     Properties:
       Items: =ShowColumns(Sort('Check Pilots', ListOrder, SortOrder.Ascending), Title)
+      AllowEmptySelection: =true
+      Default: =Blank()
       X: =1010
       Y: =350
       Width: =304
@@ -272,7 +274,7 @@
                     TargetDate: dpITarget.SelectedDate,
                     Status: "Open"
                 });
-                Reset(txtIStatement); Reset(dpITarget);
+                Reset(txtIStatement); Reset(ddIPilot); Reset(dpITarget);
                 Notify("Intention added", NotificationType.Success),
                 Notify(FirstError.Message, NotificationType.Error)
             )
