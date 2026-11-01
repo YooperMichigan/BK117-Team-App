@@ -1,0 +1,24 @@
+# "I intend to..." sidebar button for HomeScreen / MeetingsScreen / NewMeetingScreen.
+# Rename to btnNavIntend2 / btnNavIntend3 on the second and third screen.
+- btnNavIntend:
+    Control: Classic/Button
+    Properties:
+      Align: =Align.Left
+      BorderThickness: =0
+      Color: =RGBA(195, 203, 212, 1)
+      Fill: =RGBA(14, 34, 64, 1)
+      Height: =46
+      HoverColor: =Color.White
+      HoverFill: =RGBA(31, 58, 99, 1)
+      OnSelect: =Navigate(IntendScreen)
+      PaddingLeft: =14
+      PressedFill: =RGBA(31, 58, 99, 1)
+      RadiusBottomLeft: =8
+      RadiusBottomRight: =8
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      Size: =13
+      Text: ="I intend to..."
+      Width: =200
+      X: =18
+      Y: =220

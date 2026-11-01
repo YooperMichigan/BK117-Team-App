@@ -12,98 +12,95 @@
     Control: Rectangle
     Properties:
       Fill: =RGBA(14, 34, 64, 1)
-      X: =0
-      Y: =0
-      Width: =232
       Height: =Parent.Height
+      Width: =232
 - lblKickerBrand4:
     Control: Label
     Properties:
-      Text: ="TRAINING DEPARTMENT"
-      X: =24
-      Y: =24
-      Width: =200
-      Height: =20
-      Size: =9
-      FontWeight: =FontWeight.Semibold
       Color: =RGBA(195, 203, 212, 1)
+      FontWeight: =FontWeight.Semibold
+      Height: =30
+      Size: =9
+      Text: ="AIR METHODS-TRAINING DEPARTMENT"
+      Width: =200
+      X: =23
+      Y: =15
 - lblBrand4:
     Control: Label
     Properties:
-      Text: ="BK117 Check Pilots"
-      X: =24
-      Y: =44
-      Width: =200
+      Color: =Color.White
+      FontWeight: =FontWeight.Bold
       Height: =60
       Size: =18
-      FontWeight: =FontWeight.Bold
-      Color: =Color.White
+      Text: ="BK117 Check Pilots"
+      Width: =200
+      X: =23
+      Y: =50
 - btnNavHome4:
     Control: Classic/Button
     Properties:
-      Text: ="Home"
-      X: =16
-      Y: =116
-      Width: =200
-      Height: =46
-      Size: =13
       Align: =Align.Left
-      PaddingLeft: =14
-      Fill: =RGBA(14, 34, 64, 1)
-      HoverFill: =RGBA(31, 58, 99, 1)
-      PressedFill: =RGBA(31, 58, 99, 1)
-      Color: =RGBA(195, 203, 212, 1)
-      HoverColor: =Color.White
       BorderThickness: =0
-      RadiusTopLeft: =8
-      RadiusTopRight: =8
+      Color: =RGBA(195, 203, 212, 1)
+      Fill: =RGBA(14, 34, 64, 1)
+      Height: =46
+      HoverColor: =Color.White
+      HoverFill: =RGBA(31, 58, 99, 1)
+      OnSelect: =Navigate(HomeScreen)
+      PaddingLeft: =14
+      PressedFill: =RGBA(31, 58, 99, 1)
       RadiusBottomLeft: =8
       RadiusBottomRight: =8
-      OnSelect: =Navigate(HomeScreen)
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      Size: =13
+      Text: ="Home"
+      Width: =200
+      X: =18
+      Y: =120
 - btnNavMeetings4:
     Control: Classic/Button
     Properties:
-      Text: ="Meetings"
-      X: =16
-      Y: =166
-      Width: =200
-      Height: =46
-      Size: =13
       Align: =Align.Left
-      PaddingLeft: =14
-      Fill: =RGBA(14, 34, 64, 1)
-      HoverFill: =RGBA(31, 58, 99, 1)
-      PressedFill: =RGBA(31, 58, 99, 1)
-      Color: =RGBA(195, 203, 212, 1)
-      HoverColor: =Color.White
       BorderThickness: =0
-      RadiusTopLeft: =8
-      RadiusTopRight: =8
+      Color: =RGBA(195, 203, 212, 1)
+      Fill: =RGBA(14, 34, 64, 1)
+      Height: =46
+      HoverColor: =Color.White
+      HoverFill: =RGBA(31, 58, 99, 1)
+      OnSelect: =Navigate(MeetingsScreen)
+      PaddingLeft: =14
+      PressedFill: =RGBA(31, 58, 99, 1)
       RadiusBottomLeft: =8
       RadiusBottomRight: =8
-      OnSelect: =Navigate(MeetingsScreen)
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      Size: =13
+      Text: ="Meetings"
+      Width: =200
+      X: =18
+      Y: =170
 - btnNavIntend4:
     Control: Classic/Button
     Properties:
-      Text: ="I intend to..."
-      X: =16
-      Y: =216
-      Width: =200
-      Height: =46
-      Size: =13
-      FontWeight: =FontWeight.Semibold
       Align: =Align.Left
-      PaddingLeft: =14
-      Fill: =RGBA(31, 58, 99, 1)
-      HoverFill: =RGBA(31, 58, 99, 1)
-      PressedFill: =RGBA(31, 58, 99, 1)
-      Color: =Color.White
-      HoverColor: =Color.White
       BorderThickness: =0
-      RadiusTopLeft: =8
-      RadiusTopRight: =8
+      Color: =Color.White
+      Fill: =RGBA(31, 58, 99, 1)
+      Height: =46
+      HoverColor: =Color.White
+      HoverFill: =RGBA(31, 58, 99, 1)
+      PaddingLeft: =14
+      PressedFill: =RGBA(31, 58, 99, 1)
       RadiusBottomLeft: =8
       RadiusBottomRight: =8
+      RadiusTopLeft: =8
+      RadiusTopRight: =8
+      Size: =13
+      Text: ="I intend to..."
+      Width: =200
+      X: =18
+      Y: =220
 - lblIntendTitle:
     Control: Label
     Properties:
