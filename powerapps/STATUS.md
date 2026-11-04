@@ -56,7 +56,8 @@ Connectors: SharePoint, Office 365 Outlook (minutes email is sent from the perso
    `CountRows(<gallery>.AllItems)` work.
 8. Teams caches the app name and icon: remove and re-add the app from Power Apps "Add to Teams".
 9. F5 does nothing on the Mac: use the play button (or Option-click to test on the canvas).
-10. Claude cannot see or edit the app directly; changes go through Chad pasting into Studio.
+10. Patch agenda items through `LookUp(AgendaItems, ID = ThisItem.ID)`, not `ThisItem`: typing a note and then tapping a button saved twice from the same stale copy and caused "Save Conflict".
+11. Claude cannot see or edit the app directly; changes go through Chad pasting into Studio.
 
 ## Ideas not yet built
 

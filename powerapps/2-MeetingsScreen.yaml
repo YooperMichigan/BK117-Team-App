@@ -247,7 +247,7 @@
             BorderColor: =RGBA(226, 224, 219, 1)
             DisplayMode: =If(varMeeting.Status = "Held" || ThisItem.Status = "Carried", DisplayMode.View, DisplayMode.Edit)
             OnChange: |-
-              =Patch(AgendaItems, ThisItem, {Notes: Self.Text})
+              =Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Notes: Self.Text})
       - btnDiscussed:
           Control: Classic/Button
           Properties:
@@ -270,7 +270,7 @@
             RadiusBottomLeft: =10
             RadiusBottomRight: =10
             OnSelect: |-
-              =Patch(AgendaItems, ThisItem, {Status: If(ThisItem.Status = "Discussed", "Open", "Discussed")})
+              =Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Status: If(ThisItem.Status = "Discussed", "Open", "Discussed")})
       - btnUp:
           Control: Classic/Button
           Properties:
@@ -297,8 +297,8 @@
                       Filter(AgendaItems, MeetingID = varMeeting.ID && Position < ThisItem.Position),
                       Position, SortOrder.Descending))},
                   If(!IsBlank(prev),
-                      Patch(AgendaItems, prev, {Position: ThisItem.Position});
-                      Patch(AgendaItems, ThisItem, {Position: prev.Position})
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = prev.ID), {Position: ThisItem.Position});
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Position: prev.Position})
                   )
               )
       - btnDown:
@@ -327,8 +327,8 @@
                       Filter(AgendaItems, MeetingID = varMeeting.ID && Position > ThisItem.Position),
                       Position, SortOrder.Ascending))},
                   If(!IsBlank(following),
-                      Patch(AgendaItems, following, {Position: ThisItem.Position});
-                      Patch(AgendaItems, ThisItem, {Position: following.Position})
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = following.ID), {Position: ThisItem.Position});
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Position: following.Position})
                   )
               )
       - btnDelete:
