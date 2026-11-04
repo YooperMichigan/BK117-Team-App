@@ -299,15 +299,4 @@
             RadiusBottomLeft: =8
             RadiusBottomRight: =8
             OnSelect: =Set(varArmed, Blank())
-- lblMeetingsNone:
-    Control: Label
-    Properties:
-      Visible: =!IsBlank(varMeeting) && CountRows(galMeetings.AllItems) = 0
-      Text: =If(varShowPast, "No completed meetings yet.", "No upcoming meetings. Tap + New meeting to add one.")
-      X: =1004
-      Y: =508
-      Width: =316
-      Height: =48
-      Size: =11
-      Color: =RGBA(91, 100, 112, 1)
-# After pasting: select imgMeetingsEmpty, then lblNoMeetingsList, and Reorder > Bring to front.
+# Empty-state pictures and hints for this list: 14-Meetings-EmptyStates.yaml

@@ -1,0 +1,57 @@
+# BK117 Team App: Meetings screen empty-state pictures and hints.
+# Covers no meetings at all, an empty Upcoming / Past tab, and a completed (locked) meeting.
+# First delete imgAddEmpty, imgMeetingsEmpty, lblAddHint, lblNoMeetingsList and lblMeetingsNone
+# from MeetingsScreen, then right-click MeetingsScreen, Paste code.
+# If a hint ends up behind its picture: right-click the label, Reorder > Bring to front.
+- imgAddEmpty:
+    Control: Image
+    Properties:
+      Image: ='add-item-empty'
+      ImagePosition: =ImagePosition.Fit
+      Visible: =IsBlank(varMeeting) || varMeeting.Status = "Held"
+      X: =990
+      Y: =168
+      Width: =344
+      Height: =262
+- imgMeetingsEmpty:
+    Control: Image
+    Properties:
+      Image: ='meetings-list-empty'
+      ImagePosition: =ImagePosition.Fit
+      Visible: =CountRows(galMeetings.AllItems) = 0
+      X: =990
+      Y: =492
+      Width: =344
+      Height: =252
+- lblAddHint:
+    Control: Label
+    Properties:
+      Visible: =IsBlank(varMeeting) || varMeeting.Status = "Held"
+      Text: |-
+        =If(
+            IsBlank(varMeeting),
+            "Once a meeting is created, you can add agenda items here.",
+            "This meeting is completed, so its agenda and notes are locked. To change it, find it under Past and choose Actions > Reopen."
+        )
+      X: =1004
+      Y: =184
+      Width: =316
+      Height: =72
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
+- lblMeetingsNone:
+    Control: Label
+    Properties:
+      Visible: =CountRows(galMeetings.AllItems) = 0
+      Text: |-
+        =If(
+            IsBlank(varMeeting), "Meetings you create appear here.",
+            varShowPast, "No completed meetings yet.",
+            "No upcoming meetings. Tap + New meeting to add one."
+        )
+      X: =1004
+      Y: =508
+      Width: =316
+      Height: =48
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)
