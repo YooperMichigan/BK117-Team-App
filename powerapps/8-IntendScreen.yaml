@@ -79,7 +79,7 @@
       Text: ="Meetings"
       Width: =200
       X: =18
-      Y: =170
+      Y: =220
 - btnNavIntend4:
     Control: Classic/Button
     Properties:
@@ -100,7 +100,7 @@
       Text: ="I intend to..."
       Width: =200
       X: =18
-      Y: =220
+      Y: =270
 - lblIntendTitle:
     Control: Label
     Properties:

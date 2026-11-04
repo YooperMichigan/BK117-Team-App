@@ -80,7 +80,7 @@
       Text: ="Meetings"
       Width: =200
       X: =18
-      Y: =170
+      Y: =220
 - btnNavIntend5:
     Control: Classic/Button
     Properties:
@@ -102,7 +102,7 @@
       Text: ="I intend to..."
       Width: =200
       X: =18
-      Y: =220
+      Y: =270
 - btnNavFiles5:
     Control: Classic/Button
     Properties:
@@ -123,7 +123,7 @@
       Text: ="Team Files"
       Width: =200
       X: =18
-      Y: =270
+      Y: =170
 - rectFHero:
     Control: Rectangle
     Properties:
