@@ -13,6 +13,8 @@ Air Methods' own Microsoft 365 without an IT ticket. Data lives in three SharePo
 | `6-MeetingList-Actions.yaml` | Meeting list with an Actions drop-down: Mark complete, Reopen, Delete meeting | Replaces lblMeetings + galMeetings on `MeetingsScreen` |
 | `8-IntendScreen.yaml` | "I intend to..." page shell | Paste into a blank `IntendScreen` |
 | `9-IntendContent.yaml` | "I intend to..." header, list and add box (needs the Intentions list) | Paste into `IntendScreen` |
+| `11-FilesScreen.yaml` | Team Files page: lists BK117 CA Files from the site Documents library | Paste into a blank `FilesScreen` |
+| `12-NavFilesButton.yaml` | "Team Files" sidebar button for the other screens | Paste on each screen, unique name |
 
 Step-by-step instructions, including the SharePoint list columns, are in the build guide doc.
 
