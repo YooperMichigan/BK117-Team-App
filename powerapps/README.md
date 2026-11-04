@@ -1,5 +1,7 @@
 # BK117 Check Pilots: Power Apps version
 
+**Start here:** `STATUS.md` has the current state of the live app, its SharePoint lists, screens, colours and lessons learned.
+
 A Power Apps canvas app version of the meeting agenda, so it can run inside Teams on
 Air Methods' own Microsoft 365 without an IT ticket. Data lives in three SharePoint lists.
 
