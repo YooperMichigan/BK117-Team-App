@@ -1,22 +1,123 @@
-# BK117 Check Pilots: meeting list with an Actions drop-down per meeting.
-# First delete lblMeetings and galMeetings (and btnCarry, btnHeld) from MeetingsScreen,
-# then right-click MeetingsScreen, Paste code.
-- lblMeetings:
-    Control: Label
+# BK117 Team App: meeting list with Upcoming / Past tabs, an Actions drop-down per meeting,
+# and minutes emailed when a meeting is marked complete.
+# Before pasting:
+#   - Check Pilots list has an Email column (Single line of text) filled in for each pilot
+#   - Office 365 Outlook is added under Data
+#   - App.OnStart is the version in 1-App-OnStart.txt (sets varShowPast)
+# Then on MeetingsScreen delete lblMeetings and galMeetings (keep btnNewMeeting),
+# right-click MeetingsScreen, Paste code.
+- btnShowUpcoming:
+    Control: Classic/Button
     Properties:
-      Text: ="All meetings"
+      Text: ="Upcoming"
       X: =990
-      Y: =448
-      Width: =190
-      Height: =32
-      Size: =13
+      Y: =444
+      Width: =92
+      Height: =40
+      Size: =11
       FontWeight: =FontWeight.Bold
-      Color: =RGBA(22, 32, 44, 1)
+      Fill: =If(varShowPast, Color.White, RGBA(14, 34, 64, 1))
+      HoverFill: =If(varShowPast, RGBA(243, 242, 239, 1), RGBA(14, 34, 64, 1))
+      Color: =If(varShowPast, RGBA(14, 34, 64, 1), Color.White)
+      HoverColor: =If(varShowPast, RGBA(14, 34, 64, 1), Color.White)
+      BorderColor: =RGBA(14, 34, 64, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =10
+      RadiusTopRight: =0
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =0
+      OnSelect: =Set(varShowPast, false); Set(varArmed, Blank())
+- btnShowPast:
+    Control: Classic/Button
+    Properties:
+      Text: ="Past"
+      X: =1080
+      Y: =444
+      Width: =86
+      Height: =40
+      Size: =11
+      FontWeight: =FontWeight.Bold
+      Fill: =If(varShowPast, RGBA(14, 34, 64, 1), Color.White)
+      HoverFill: =If(varShowPast, RGBA(14, 34, 64, 1), RGBA(243, 242, 239, 1))
+      Color: =If(varShowPast, Color.White, RGBA(14, 34, 64, 1))
+      HoverColor: =If(varShowPast, Color.White, RGBA(14, 34, 64, 1))
+      BorderColor: =RGBA(14, 34, 64, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =0
+      RadiusTopRight: =10
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =10
+      OnSelect: =Set(varShowPast, true); Set(varArmed, Blank())
+- btnSendMinutes:
+    Control: Classic/Button
+    Properties:
+      Visible: =false
+      Text: ="Send minutes"
+      X: =990
+      Y: =748
+      Width: =100
+      Height: =10
+      OnSelect: |-
+        =With(
+            {
+                m: LookUp(Meetings, ID = varMailMeeting.ID),
+                items: Sort(Filter(AgendaItems, MeetingID = varMailMeeting.ID), Position, SortOrder.Ascending),
+                st: Value(Left(varMailMeeting.StartTime, 2)) * 60 + Value(Right(varMailMeeting.StartTime, 2)),
+                sendTo: Concat(Filter('Check Pilots', !IsBlank(Email)), Email, ";")
+            },
+            IfError(
+                Office365Outlook.SendEmailV2(
+                    If(IsBlank(sendTo), User().Email, sendTo),
+                    "BK117 meeting minutes: " & Text(m.MeetingDate, "mmm d, yyyy"),
+                    "<div style='font-family:Segoe UI,Arial,sans-serif;color:#16202C'>" &
+                    "<h2 style='color:#0E2240;margin:0 0 4px'>" & m.Title & "</h2>" &
+                    "<p style='margin:0 0 16px;color:#5B6470'>" &
+                        Text(m.MeetingDate, "dddd, mmmm d, yyyy") & " · " & m.StartTime &
+                        If(!IsBlank(m.EndTime), "–" & m.EndTime) &
+                        If(!IsBlank(m.Location), " · " & m.Location) &
+                    "</p>" &
+                    If(
+                        CountRows(items) = 0,
+                        "<p>No agenda items.</p>",
+                        "<table cellpadding='8' style='border-collapse:collapse;width:100%;font-size:14px'>" &
+                        "<tr style='background:#0E2240;color:#FFFFFF;text-align:left'>" &
+                        "<th>Time</th><th>Item</th><th>Presenter</th><th>Status</th><th>Notes</th></tr>" &
+                        Concat(
+                            items As a,
+                            "<tr style='border-bottom:1px solid #E2E0DB;vertical-align:top'>" &
+                            "<td>" &
+                                With(
+                                    {t: st + Sum(Filter(items, Position < a.Position), Minutes)},
+                                    Text(Time(Mod(RoundDown(t / 60, 0), 24), Mod(t, 60), 0), "hh:mm")
+                                ) &
+                            "</td>" &
+                            "<td><b>" & a.Title & "</b>" &
+                                If(!IsBlank(a.CarriedFrom), "<br><span style='color:#5B6470'>carried from " & Text(a.CarriedFrom, "mmm d") & "</span>") &
+                            "</td>" &
+                            "<td>" & If(IsBlank(a.Presenter), "-", a.Presenter) & "</td>" &
+                            "<td>" & If(a.Status = "Carried", "Carried to next meeting", a.Status) & "</td>" &
+                            "<td>" & Substitute(Substitute(Substitute(a.Notes, "&", "&amp;"), "<", "&lt;"), Char(10), "<br>") & "</td>" &
+                            "</tr>"
+                        ) &
+                        "</table>"
+                    ) &
+                    "<p style='margin-top:16px;color:#5B6470;font-size:12px'>Sent from the BK117 Team App by " & User().FullName & "</p>" &
+                    "</div>"
+                );
+                Notify("Minutes emailed", NotificationType.Success),
+                Notify("The minutes could not be emailed: " & FirstError.Message, NotificationType.Error)
+            )
+        )
 - galMeetings:
     Control: Gallery
     Variant: Vertical
     Properties:
-      Items: =Sort(Meetings, MeetingDate, SortOrder.Descending)
+      Items: |-
+        =If(
+            varShowPast,
+            Sort(Filter(Meetings, Status = "Held"), MeetingDate, SortOrder.Descending),
+            Sort(Filter(Meetings, Status <> "Held"), MeetingDate, SortOrder.Ascending)
+        )
       X: =990
       Y: =492
       Width: =344
@@ -43,7 +144,7 @@
           Control: Label
           Properties:
             OnSelect: =Select(Parent)
-            Text: =ThisItem.StartTime & " · " & If(ThisItem.Status = "Held", "Completed", ThisItem.Status)
+            Text: =ThisItem.StartTime & If(!IsBlank(ThisItem.EndTime), "–" & ThisItem.EndTime) & " · " & If(ThisItem.Status = "Held", "Completed", ThisItem.Status)
             X: =14
             Y: =30
             Width: =180
@@ -55,7 +156,7 @@
           Properties:
             Visible: =!(varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID)
             Items: |-
-              =If(ThisItem.Status = "Held", ["Actions", "Reopen", "Delete meeting"], ["Actions", "Edit meeting", "Mark complete", "Delete meeting"])
+              =If(ThisItem.Status = "Held", ["Actions", "Email minutes", "Reopen"], ["Actions", "Edit meeting", "Mark complete", "Delete meeting"])
             Default: ="Actions"
             X: =200
             Y: =10
@@ -72,17 +173,20 @@
                       Navigate(NewMeetingScreen),
                   "Mark complete", Set(varArmed, "mdone" & ThisItem.ID),
                   "Delete meeting", Set(varArmed, "mdel" & ThisItem.ID),
+                  "Email minutes",
+                      Set(varMailMeeting, ThisItem);
+                      Select(btnSendMinutes),
                   "Reopen",
                       Patch(Meetings, ThisItem, {Status: "Upcoming"});
                       If(ThisItem.ID = varMeeting.ID, Set(varMeeting, LookUp(Meetings, ID = ThisItem.ID)));
-                      Notify("Meeting reopened", NotificationType.Success)
+                      Notify("Meeting reopened. It is now under Upcoming.", NotificationType.Success)
               );
               Reset(Self)
       - btnMConfirm:
           Control: Classic/Button
           Properties:
             Visible: =varArmed = "mdel" & ThisItem.ID || varArmed = "mdone" & ThisItem.ID
-            Text: =If(varArmed = "mdel" & ThisItem.ID, "Confirm delete", "Confirm")
+            Text: =If(varArmed = "mdel" & ThisItem.ID, "Confirm delete", "Complete")
             X: =196
             Y: =10
             Width: =104
@@ -144,9 +248,11 @@
                           If(m.ID = varMeeting.ID, Set(varMeeting, LookUp(Meetings, ID = m.ID)));
                           Notify(
                               If(IsBlank(nextMeeting) || CountRows(openItems) = 0,
-                                  "Meeting marked complete",
-                                  "Meeting marked complete. " & CountRows(openItems) & " open items moved to " & Text(nextMeeting.MeetingDate, "mmm d")),
-                              NotificationType.Success)
+                                  "Meeting marked complete. Emailing the minutes...",
+                                  "Meeting marked complete. " & CountRows(openItems) & " open items moved to " & Text(nextMeeting.MeetingDate, "mmm d") & ". Emailing the minutes..."),
+                              NotificationType.Success);
+                          Set(varMailMeeting, m);
+                          Select(btnSendMinutes)
                       )
                   )
               );
@@ -172,3 +278,14 @@
             RadiusBottomLeft: =8
             RadiusBottomRight: =8
             OnSelect: =Set(varArmed, Blank())
+- lblMeetingsNone:
+    Control: Label
+    Properties:
+      Visible: =!IsBlank(varMeeting) && CountRows(galMeetings.AllItems) = 0
+      Text: =If(varShowPast, "No completed meetings yet.", "No upcoming meetings. Tap + New meeting to add one.")
+      X: =1004
+      Y: =508
+      Width: =316
+      Height: =48
+      Size: =11
+      Color: =RGBA(91, 100, 112, 1)

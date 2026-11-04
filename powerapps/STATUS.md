@@ -11,7 +11,7 @@ Site: https://airmethods0.sharepoint.com/sites/BK117CAGroup
 
 | List / library | Name in formulas | Columns used |
 | --- | --- | --- |
-| Check Pilots | `'Check Pilots'` (has a space) | Title (name), ListOrder (number) |
+| Check Pilots | `'Check Pilots'` (has a space) | Title (name), ListOrder (number), Email (text, work email; minutes go to these) |
 | Meetings | `Meetings` | Title, MeetingDate (date only), StartTime (text HH:MM), EndTime (text HH:MM), Location, Status (`Upcoming` / `Held`, shown as "Completed") |
 | AgendaItems | `AgendaItems` | Title, MeetingID (number), Position, Presenter (text), Minutes, Notes, Status (`Open` / `Discussed` / `Carried`), CarriedFrom (date) |
 | Intentions | `Intentions` | Title (the statement), Pilot (text), TargetDate (date), Status (`Open` / `Done`) |
@@ -30,11 +30,12 @@ Sidebar: kicker "AIR METHODS-TRAINING DEPARTMENT" at X 23 Y 15, brand at X 23 Y 
 | --- | --- | --- |
 | HomeScreen | App start screen; helicopter sketch (`imgHome`) | `5-HomeScreen.yaml` |
 | FilesScreen | Lists BK117 CA Files (folders first, A-Z), search reaches subfolders, Open / Open folder | `11-FilesScreen.yaml` |
-| MeetingsScreen | Meeting card, agenda with clock times, add item, meeting list with Actions (Edit, Mark complete, Reopen, Delete) | `2-MeetingsScreen.yaml`, `6-MeetingList-Actions.yaml` |
+| MeetingsScreen | Meeting card, agenda with clock times, add item, meeting list with Upcoming / Past tabs and Actions (upcoming: Edit, Mark complete, Delete; past: Email minutes, Reopen). Completed meetings are read-only and cannot be deleted. Mark complete emails the minutes (hidden `btnSendMinutes`, Office 365 Outlook) | `2-MeetingsScreen.yaml`, `6-MeetingList-Actions.yaml` |
 | NewMeetingScreen | New / edit meeting (start 11:00, end follows start +60) | `3-NewMeetingScreen.yaml`, `4-NewMeetingScreen-OnVisible.txt` |
 | IntendScreen | "I intend to..." list with Mark done / Delete and Add an intention | `8-IntendScreen.yaml`, `9-IntendContent.yaml` |
 
-App.OnStart: `1-App-OnStart.txt` (sets varMeeting, varArmed, varEditMeeting).
+App.OnStart: `1-App-OnStart.txt` (sets varMeeting, varArmed, varEditMeeting, varShowPast).
+Connectors: SharePoint, Office 365 Outlook (minutes email is sent from the person who taps Complete).
 
 ## Look
 
@@ -62,4 +63,5 @@ App.OnStart: `1-App-OnStart.txt` (sets varMeeting, varArmed, varEditMeeting).
 - Blueprint picture for an empty Team Files list
 - "Changed in the last 30 days" marker on Team Files
 - Action items list from meetings
+- Minutes saved as a PDF in Team Files (option C: needs a Power Automate flow)
 - Grey outline icon in the Teams rail (needs "Upload a custom app" or IT)
