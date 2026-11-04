@@ -247,7 +247,14 @@
             BorderColor: =RGBA(226, 224, 219, 1)
             DisplayMode: =If(varMeeting.Status = "Held" || ThisItem.Status = "Carried", DisplayMode.View, DisplayMode.Edit)
             OnChange: |-
-              =Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Notes: Self.Text})
+              =With(
+                  {id: ThisItem.ID, n: Self.Text},
+                  IfError(
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = id), {Notes: n}),
+                      Refresh(AgendaItems);
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = id), {Notes: n})
+                  )
+              )
       - btnDiscussed:
           Control: Classic/Button
           Properties:
@@ -270,7 +277,14 @@
             RadiusBottomLeft: =10
             RadiusBottomRight: =10
             OnSelect: |-
-              =Patch(AgendaItems, LookUp(AgendaItems, ID = ThisItem.ID), {Status: If(ThisItem.Status = "Discussed", "Open", "Discussed")})
+              =With(
+                  {id: ThisItem.ID, s: If(ThisItem.Status = "Discussed", "Open", "Discussed")},
+                  IfError(
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = id), {Status: s}),
+                      Refresh(AgendaItems);
+                      Patch(AgendaItems, LookUp(AgendaItems, ID = id), {Status: s})
+                  )
+              )
       - btnUp:
           Control: Classic/Button
           Properties:
