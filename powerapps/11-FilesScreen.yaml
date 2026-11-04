@@ -193,10 +193,10 @@
                         txtFileSearch.Text in 'File name with extension'
                     )
                 ),
-                Modified,
-                SortOrder.Descending
+                'File name with extension',
+                SortOrder.Ascending
             ),
-            If(CountRows(Split('File name with extension', ".")) = 1, 0, 1),
+            If(Lower(Last(Split('File name with extension', ".")).Value) in ["pdf", "doc", "docx", "xls", "xlsx", "xlsm", "csv", "ppt", "pptx", "txt", "rtf", "msg", "one", "vsdx", "jpg", "jpeg", "png", "gif", "heic", "bmp", "tif", "tiff", "mp4", "mov", "avi", "wmv", "m4v", "mp3", "wav", "m4a", "zip"], 1, 0),
             SortOrder.Ascending
         )
       X: =265
@@ -212,8 +212,8 @@
           Properties:
             Text: |-
               =With(
-                  {parts: Split(ThisItem.'File name with extension', ".")},
-                  If(CountRows(parts) = 1, "FOLDER", Upper(Last(parts).Value))
+                  {ext: Lower(Last(Split(ThisItem.'File name with extension', ".")).Value)},
+                  If(ext in ["pdf", "doc", "docx", "xls", "xlsx", "xlsm", "csv", "ppt", "pptx", "txt", "rtf", "msg", "one", "vsdx", "jpg", "jpeg", "png", "gif", "heic", "bmp", "tif", "tiff", "mp4", "mov", "avi", "wmv", "m4v", "mp3", "wav", "m4a", "zip"], Upper(ext), "FOLDER")
               )
             X: =20
             Y: =22
@@ -222,8 +222,8 @@
             Size: =8
             FontWeight: =FontWeight.Bold
             Align: =Align.Center
-            Fill: =If(CountRows(Split(ThisItem.'File name with extension', ".")) = 1, RGBA(251, 227, 212, 1), RGBA(229, 228, 223, 1))
-            Color: =If(CountRows(Split(ThisItem.'File name with extension', ".")) = 1, RGBA(180, 72, 15, 1), RGBA(91, 100, 112, 1))
+            Fill: =If(Self.Text = "FOLDER", RGBA(251, 227, 212, 1), RGBA(229, 228, 223, 1))
+            Color: =If(Self.Text = "FOLDER", RGBA(180, 72, 15, 1), RGBA(91, 100, 112, 1))
       - lblFName:
           Control: Label
           Properties:
