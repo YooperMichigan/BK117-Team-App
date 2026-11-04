@@ -4,8 +4,29 @@
 #   - Check Pilots list has an Email column (Single line of text) filled in for each pilot
 #   - Office 365 Outlook is added under Data
 #   - App.OnStart is the version in 1-App-OnStart.txt (sets varShowPast)
-# Then on MeetingsScreen delete lblMeetings and galMeetings (keep btnNewMeeting),
+# Then on MeetingsScreen delete lblMeetings, galMeetings and btnNewMeeting,
 # right-click MeetingsScreen, Paste code.
+- btnNewMeeting:
+    Control: Classic/Button
+    Properties:
+      Text: ="+ New meeting"
+      X: =1180
+      Y: =444
+      Width: =154
+      Height: =40
+      Size: =11
+      FontWeight: =FontWeight.Bold
+      Fill: =Color.White
+      HoverFill: =RGBA(251, 227, 212, 1)
+      Color: =RGBA(180, 72, 15, 1)
+      HoverColor: =RGBA(180, 72, 15, 1)
+      BorderColor: =RGBA(232, 105, 31, 1)
+      BorderThickness: =2
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      OnSelect: =Set(varEditMeeting, false); Set(varShowPast, false); Navigate(NewMeetingScreen)
 - btnShowUpcoming:
     Control: Classic/Button
     Properties:
@@ -124,7 +145,7 @@
       Height: =252
       TemplateSize: =60
       TemplatePadding: =0
-      Fill: =Color.White
+      Fill: =Color.Transparent
       TemplateFill: =If(ThisItem.ID = varMeeting.ID, RGBA(251, 227, 212, 1), Color.Transparent)
       OnSelect: =Set(varMeeting, ThisItem); Set(varArmed, Blank())
     Children:
@@ -289,3 +310,4 @@
       Height: =48
       Size: =11
       Color: =RGBA(91, 100, 112, 1)
+# After pasting: select imgMeetingsEmpty, then lblNoMeetingsList, and Reorder > Bring to front.
